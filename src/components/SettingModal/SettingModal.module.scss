@@ -29,3 +29,32 @@
   margin: 0;
   color: var(--color-text-secondary);
 }
+
+.wordLengthButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.wordLengthButton {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--color-text-secondary);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-correct);
+  }
+}
+
+.wordLengthButtonActive {
+  background: var(--color-correct);
+  border-color: var(--color-correct);
+  color: white;
+}

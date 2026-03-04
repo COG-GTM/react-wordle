@@ -9,21 +9,17 @@ import StatsModal from 'components/StatsModal';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useAlert from 'hooks/useAlert';
 import {
-  solution,
-  solutionIndex,
+  getWordOfDay,
   isWordValid,
   findFirstUnusedReveal,
   addStatsForCompletedGame,
 } from 'lib/words';
-import {
-  ALERT_DELAY,
-  MAX_CHALLENGES,
-  MAX_WORD_LENGTH,
-} from 'constants/settings';
+import { ALERT_DELAY, MAX_CHALLENGES } from 'constants/settings';
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
 function App() {
+  const [wordLength, setWordLength] = useLocalStorage('word-length', 5);
   const [boardState, setBoardState] = useLocalStorage('boardState', {
     guesses: [],
     solutionIndex: '',
@@ -42,6 +38,9 @@ function App() {
     totalGames: 0,
     successRate: 0,
   });
+
+  const { solution, solutionIndex } = getWordOfDay(wordLength);
+
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState(() => {
     if (boardState.solutionIndex !== solutionIndex) return [];
@@ -74,6 +73,17 @@ function App() {
     // eslint-disable-next-line
   }, [guesses]);
 
+  // Reset board when word length changes
+  const handleWordLengthChange = newLength => {
+    if (newLength === wordLength) return;
+    setWordLength(newLength);
+    setCurrentGuess('');
+    setGuesses([]);
+    setIsGameWon(false);
+    setIsGameLost(false);
+    setBoardState({ guesses: [], solutionIndex: '' });
+  };
+
   // Check game winning or losing
   useEffect(() => {
     if (guesses.includes(solution.toUpperCase())) {
@@ -89,7 +99,7 @@ function App() {
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     }
     // eslint-disable-next-line
-  }, [guesses]);
+  }, [guesses, solution]);
 
   useEffect(() => {
     if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
@@ -116,7 +126,7 @@ function App() {
   };
 
   const handleKeyDown = letter =>
-    currentGuess.length < MAX_WORD_LENGTH &&
+    currentGuess.length < wordLength &&
     !isGameWon &&
     setCurrentGuess(currentGuess + letter);
 
@@ -126,18 +136,22 @@ function App() {
   const handleEnter = () => {
     if (isGameWon || isGameLost) return;
 
-    if (currentGuess.length < MAX_WORD_LENGTH) {
+    if (currentGuess.length < wordLength) {
       setIsJiggling(true);
       return showAlert('Not enough letters', 'error');
     }
 
-    if (!isWordValid(currentGuess)) {
+    if (!isWordValid(currentGuess, wordLength)) {
       setIsJiggling(true);
       return showAlert('Not in word list', 'error');
     }
 
     if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
+      const firstMissingReveal = findFirstUnusedReveal(
+        currentGuess,
+        guesses,
+        solution
+      );
       if (firstMissingReveal) {
         setIsJiggling(true);
         return showAlert(firstMissingReveal, 'error');
@@ -167,12 +181,15 @@ function App() {
         guesses={guesses}
         isJiggling={isJiggling}
         setIsJiggling={setIsJiggling}
+        wordLength={wordLength}
+        solution={solution}
       />
       <Keyboard
         onEnter={handleEnter}
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
         guesses={guesses}
+        solution={solution}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -187,6 +204,8 @@ function App() {
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
+        wordLength={wordLength}
+        setWordLength={handleWordLengthChange}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
@@ -198,6 +217,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        solution={solution}
       />
     </div>
   );

@@ -14,9 +14,10 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  solution,
 }) => {
   const handleShare = () => {
-    shareStatus(guesses, isGameLost, isHardMode);
+    shareStatus(guesses, isGameLost, isHardMode, solution);
     showAlert('Game copied to clipboard', 'success');
   };
 
