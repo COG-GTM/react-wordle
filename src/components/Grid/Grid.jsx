@@ -53,8 +53,12 @@ const CurrentRow = ({ guess, isJiggling, wordLength }) => {
     [styles.jiggle]: isJiggling,
   });
 
+  const rowStyle = {
+    gridTemplateColumns: `repeat(${wordLength}, 1fr)`,
+  };
+
   return (
-    <div className={classes}>
+    <div className={classes} style={rowStyle}>
       {cells.map((letter, index) => (
         <Cell key={index} value={letter} />
       ))}
@@ -65,9 +69,12 @@ const CurrentRow = ({ guess, isJiggling, wordLength }) => {
 const CompletedRow = ({ guess, solution }) => {
   const cells = guess.split('');
   const statuses = getGuessStatuses(guess, solution);
+  const rowStyle = {
+    gridTemplateColumns: `repeat(${cells.length}, 1fr)`,
+  };
 
   return (
-    <div className={styles.row}>
+    <div className={styles.row} style={rowStyle}>
       {cells.map((letter, index) => (
         <Cell
           key={index}
@@ -83,9 +90,12 @@ const CompletedRow = ({ guess, solution }) => {
 
 const EmptyRow = ({ wordLength }) => {
   const cells = Array(wordLength).fill();
+  const rowStyle = {
+    gridTemplateColumns: `repeat(${wordLength}, 1fr)`,
+  };
 
   return (
-    <div className={styles.row}>
+    <div className={styles.row} style={rowStyle}>
       {cells.map((_, index) => (
         <Cell key={index} />
       ))}
