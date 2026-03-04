@@ -1,17 +1,48 @@
 import { MAX_CHALLENGES } from 'constants/settings';
 import { VALID_GUESSES } from 'constants/validGuesses';
 import { WORDS } from 'constants/wordList';
+import { VALID_GUESSES_4 } from 'constants/validGuesses4';
+import { WORDS_4 } from 'constants/wordList4';
+import { VALID_GUESSES_6 } from 'constants/validGuesses6';
+import { WORDS_6 } from 'constants/wordList6';
 
-export const isWordValid = word => {
+const getWordListForLength = wordLength => {
+  switch (wordLength) {
+    case 4:
+      return WORDS_4;
+    case 6:
+      return WORDS_6;
+    case 5:
+    default:
+      return WORDS;
+  }
+};
+
+const getValidGuessesForLength = wordLength => {
+  switch (wordLength) {
+    case 4:
+      return VALID_GUESSES_4;
+    case 6:
+      return VALID_GUESSES_6;
+    case 5:
+    default:
+      return VALID_GUESSES;
+  }
+};
+
+export const isWordValid = (word, wordLength = 5) => {
+  const validGuesses = getValidGuessesForLength(wordLength);
+  const wordList = getWordListForLength(wordLength);
   return (
-    VALID_GUESSES.includes(word.toLowerCase()) ||
-    WORDS.includes(word.toLowerCase())
+    validGuesses.includes(word.toLowerCase()) ||
+    wordList.includes(word.toLowerCase())
   );
 };
 
-export const getGuessStatuses = guess => {
+export const getGuessStatuses = (guess, currentSolution) => {
+  const sol = currentSolution || solution;
   const splitGuess = guess.toLowerCase().split('');
-  const splitSolution = solution.split('');
+  const splitSolution = sol.split('');
 
   const statuses = [];
   const solutionCharsTaken = splitSolution.map(_ => false);
@@ -52,9 +83,10 @@ export const getGuessStatuses = guess => {
   return statuses;
 };
 
-export const getStatuses = guesses => {
+export const getStatuses = (guesses, currentSolution) => {
+  const sol = currentSolution || solution;
   const charObj = {};
-  const splitSolution = solution.toUpperCase().split('');
+  const splitSolution = sol.toUpperCase().split('');
 
   guesses.forEach(word => {
     word.split('').forEach((letter, i) => {
@@ -70,14 +102,14 @@ export const getStatuses = guesses => {
 // build a set of previously revealed letters - present and correct
 // guess must use correct letters in that space and any other revealed letters
 // also check if all revealed instances of a letter are used (i.e. two C's)
-export const findFirstUnusedReveal = (word, guesses) => {
+export const findFirstUnusedReveal = (word, guesses, currentSolution) => {
   if (guesses.length === 0) {
     return false;
   }
 
   const lettersLeftArray = [];
   const guess = guesses[guesses.length - 1];
-  const statuses = getGuessStatuses(guess);
+  const statuses = getGuessStatuses(guess, currentSolution);
   const splitWord = word.toUpperCase().split('');
   const splitGuess = guess.toUpperCase().split('');
 
@@ -137,21 +169,26 @@ const getSuccessRate = gameStats => {
   );
 };
 
-export const shareStatus = (guesses, isGameLost, isHardMode) => {
+export const shareStatus = (
+  guesses,
+  isGameLost,
+  isHardMode,
+  currentSolution
+) => {
   const textToShare =
     `Wordle Game
 #${solutionIndex} 
 ${isGameLost ? 'X' : guesses.length}/${MAX_CHALLENGES} 
 ${isHardMode ? 'Hard Mode' : ''}
-\n` + generateEmojiGrid(guesses);
+\n` + generateEmojiGrid(guesses, currentSolution);
 
   navigator.clipboard.writeText(textToShare);
 };
 
-export const generateEmojiGrid = guesses => {
+export const generateEmojiGrid = (guesses, currentSolution) => {
   return guesses
     .map(guess => {
-      const status = getGuessStatuses(guess);
+      const status = getGuessStatuses(guess, currentSolution);
       const splitGuess = guess.split('');
 
       return splitGuess
@@ -170,7 +207,8 @@ export const generateEmojiGrid = guesses => {
     .join('\n');
 };
 
-export const getWordOfDay = () => {
+export const getWordOfDay = (wordLength = 5) => {
+  const wordList = getWordListForLength(wordLength);
   // January 1, 2022 Game Epoch
   const epochMs = new Date(2022, 0).valueOf();
   const now = Date.now();
@@ -179,7 +217,7 @@ export const getWordOfDay = () => {
   const nextday = (index + 1) * msInDay + epochMs;
 
   return {
-    solution: WORDS[index % WORDS.length],
+    solution: wordList[index % wordList.length],
     solutionIndex: index,
     tomorrow: nextday,
   };

@@ -2,10 +2,17 @@ import { useEffect } from 'react';
 import classNames from 'classnames';
 import Cell from 'components/Cell';
 import { getGuessStatuses } from 'lib/words';
-import { MAX_CHALLENGES, MAX_WORD_LENGTH } from 'constants/settings';
+import { MAX_CHALLENGES } from 'constants/settings';
 import styles from './Grid.module.scss';
 
-const Grid = ({ currentGuess, guesses, isJiggling, setIsJiggling }) => {
+const Grid = ({
+  currentGuess,
+  guesses,
+  isJiggling,
+  setIsJiggling,
+  wordLength,
+  solution,
+}) => {
   const empties =
     MAX_CHALLENGES > guesses.length
       ? Array(MAX_CHALLENGES - guesses.length - 1).fill()
@@ -21,20 +28,24 @@ const Grid = ({ currentGuess, guesses, isJiggling, setIsJiggling }) => {
   return (
     <div className={styles.grid}>
       {guesses.map((guess, i) => (
-        <CompletedRow key={i} guess={guess} />
+        <CompletedRow key={i} guess={guess} solution={solution} />
       ))}
       {guesses.length < MAX_CHALLENGES && (
-        <CurrentRow guess={currentGuess} isJiggling={isJiggling} />
+        <CurrentRow
+          guess={currentGuess}
+          isJiggling={isJiggling}
+          wordLength={wordLength}
+        />
       )}
       {empties.map((_, i) => (
-        <EmptyRow key={i} />
+        <EmptyRow key={i} wordLength={wordLength} />
       ))}
     </div>
   );
 };
 
-const CurrentRow = ({ guess, isJiggling }) => {
-  const emptyCells = Array(MAX_WORD_LENGTH - guess.length).fill('');
+const CurrentRow = ({ guess, isJiggling, wordLength }) => {
+  const emptyCells = Array(wordLength - guess.length).fill('');
   const cells = [...guess, ...emptyCells];
 
   const classes = classNames({
@@ -51,9 +62,9 @@ const CurrentRow = ({ guess, isJiggling }) => {
   );
 };
 
-const CompletedRow = ({ guess }) => {
+const CompletedRow = ({ guess, solution }) => {
   const cells = guess.split('');
-  const statuses = getGuessStatuses(guess);
+  const statuses = getGuessStatuses(guess, solution);
 
   return (
     <div className={styles.row}>
@@ -70,8 +81,8 @@ const CompletedRow = ({ guess }) => {
   );
 };
 
-const EmptyRow = () => {
-  const cells = Array(MAX_WORD_LENGTH).fill();
+const EmptyRow = ({ wordLength }) => {
+  const cells = Array(wordLength).fill();
 
   return (
     <div className={styles.row}>
