@@ -13,7 +13,7 @@ const SettingModal = ({
   setIsHighContrastMode,
 }) => {
   return (
-    <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
+    <Modal title="Settings" isOpen={isOpen} onClose={onClose}>
       <Row
         title="Hard Mode"
         desc="Any revealed hints must be used in subsequent guesses"
