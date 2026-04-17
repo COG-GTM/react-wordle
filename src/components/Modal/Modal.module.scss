@@ -1,5 +1,5 @@
 .modalContainer {
-  background: rgba($color: #777, $alpha: 0.5);
+  background: rgba($color: #000, $alpha: 0.85);
   position: fixed;
   top: 0;
   left: 0;
@@ -13,11 +13,14 @@
 
 .modal {
   background: var(--color-background);
-  border-radius: 10px;
-  padding: 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 0;
+  padding: 1.5rem;
   text-align: center;
   position: relative;
-  max-width: 400px;
+  max-width: 420px;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.2),
+    inset 0 0 30px rgba(0, 255, 65, 0.03);
 }
 
 .close {
@@ -28,13 +31,22 @@
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: drop-shadow(0 0 6px var(--color-icon));
+  }
 }
 
 .title {
-  font-size: 1.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  font-family: 'Press Start 2P', monospace;
   margin-bottom: 1rem;
   color: var(--color-text-primary);
+  text-shadow: 0 0 10px var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
 }
 
 @media screen and (max-width: 480px) {
@@ -44,5 +56,6 @@
 
   .title {
     margin-bottom: 0.5rem;
+    font-size: 0.8rem;
   }
 }

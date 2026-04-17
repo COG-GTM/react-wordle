@@ -1,12 +1,38 @@
 header {
   display: flex;
   justify-content: space-between;
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 0.5rem;
 }
 
 h1 {
-  font-size: 2.3rem;
+  font-size: 1.6rem;
   margin-left: 2.5rem;
   color: var(--color-text-primary);
+  text-shadow: 0 0 10px var(--color-text-primary),
+    0 0 20px var(--color-text-primary), 0 0 40px var(--color-text-primary);
+  letter-spacing: 0.3rem;
+  animation: titleFlicker 3s infinite alternate;
+}
+
+@keyframes titleFlicker {
+  0%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 0.8;
+  }
+  97% {
+    opacity: 1;
+  }
+  98% {
+    opacity: 0.6;
+  }
+  99% {
+    opacity: 1;
+  }
 }
 
 button {
@@ -15,10 +41,15 @@ button {
   background: none;
   outline: none;
   border: none;
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: drop-shadow(0 0 6px var(--color-icon));
+  }
 }
 
 @media screen and (max-width: 480px) {
   h1 {
-    font-size: 2rem;
+    font-size: 1.2rem;
   }
 }
