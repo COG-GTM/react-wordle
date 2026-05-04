@@ -14,7 +14,7 @@ export const getGuessStatuses = guess => {
   const splitSolution = solution.split('');
 
   const statuses = [];
-  const solutionCharsTaken = splitSolution.map(_ => false);
+  const solutionCharsTaken = splitSolution.map(() => false);
 
   // handle all correct cases first
   splitGuess.forEach((letter, i) => {
