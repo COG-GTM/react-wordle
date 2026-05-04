@@ -4,13 +4,13 @@
   "private": true,
   "dependencies": {
     "@vitejs/plugin-react": "^6.0.1",
-    "classnames": "^2.3.1",
+    "classnames": "^2.5.1",
     "react": "^19.2.5",
-    "react-countdown": "^2.3.2",
+    "react-countdown": "^2.3.6",
     "react-dom": "^19.2.5",
-    "react-icons": "^4.3.1",
+    "react-icons": "^5.6.0",
     "react-transition-group": "^4.4.5",
-    "sass": "^1.49.9",
+    "sass": "^1.99.0",
     "vite": "^8.0.10"
   },
   "scripts": {
@@ -20,14 +20,19 @@
     "test": "vitest",
     "fix": "prettier --write src",
     "check": "prettier --check src",
+    "lint": "eslint src/",
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^7.0.4",
     "jsdom": "^29.1.1",
     "lint-staged": "^12.3.7",
