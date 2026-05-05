@@ -8,7 +8,7 @@
 }
 
 :root {
-  --color-absent: #405069;
+  --color-absent: #d32f2f;
   --color-present: #e0c02b;
   --color-correct: #31ad23;
   --color-alert-success: #3fbf62;
@@ -45,7 +45,7 @@ body {
   font-size: 62.5%;
   font-family: 'Baloo 2', sans-serif;
   background: var(--color-background);
-  color: #fff;
+  color: var(--color-text-primary);
   min-height: 100vh;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
