@@ -3,15 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@vitejs/plugin-react": "^6.0.1",
     "classnames": "^2.5.1",
     "react": "^19.2.5",
     "react-countdown": "^2.3.6",
     "react-dom": "^19.2.5",
     "react-icons": "^5.6.0",
-    "react-transition-group": "^4.4.5",
-    "sass": "^1.99.0",
-    "vite": "^8.0.10"
+    "react-transition-group": "^4.4.5"
   },
   "scripts": {
     "start": "vite",
@@ -25,6 +22,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@vitejs/plugin-react": "^6.0.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -36,6 +34,8 @@
     "jsdom": "^29.1.1",
     "lint-staged": "^12.3.7",
     "prettier": "2.6.1",
+    "sass": "^1.99.0",
+    "vite": "^8.0.10",
     "vitest": "^4.1.5"
   },
   "lint-staged": {
