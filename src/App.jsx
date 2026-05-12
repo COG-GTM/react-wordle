@@ -28,7 +28,7 @@ function App() {
     guesses: [],
     solutionIndex: '',
   });
-  const [theme, setTheme] = useLocalStorage('theme', 'dark');
+
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
@@ -54,7 +54,7 @@ function App() {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
-  const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
+
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
 
@@ -92,18 +92,12 @@ function App() {
   }, [guesses]);
 
   useEffect(() => {
-    if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
-    else document.body.removeAttribute('data-theme');
+    document.body.removeAttribute('data-theme');
 
     if (isHighContrastMode)
       document.body.setAttribute('data-mode', 'high-contrast');
     else document.body.removeAttribute('data-mode');
-  }, [isDarkMode, isHighContrastMode]);
-
-  const handleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    setTheme(isDarkMode ? 'light' : 'dark');
-  };
+  }, [isHighContrastMode]);
 
   const handleHighContrastMode = () => {
     setIsHighContrastMode(!isHighContrastMode);
@@ -182,10 +176,8 @@ function App() {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         isHardMode={isHardMode}
-        isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
         setIsHardMode={handleHardMode}
-        setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
       />
       <StatsModal

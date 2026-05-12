@@ -6,10 +6,8 @@ const SettingModal = ({
   isOpen,
   onClose,
   isHardMode,
-  isDarkMode,
   isHighContrastMode,
   setIsHardMode,
-  setIsDarkMode,
   setIsHighContrastMode,
 }) => {
   return (
@@ -20,7 +18,6 @@ const SettingModal = ({
         isOn={isHardMode}
         onToggle={setIsHardMode}
       />
-      <Row title="Dark Mode" isOn={isDarkMode} onToggle={setIsDarkMode} />
       <Row
         title="High Contrast Mode"
         desc="For improved color vision"
