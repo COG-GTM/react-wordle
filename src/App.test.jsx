@@ -1,8 +1,13 @@
 import { render, screen } from '@testing-library/react';
+import { AlertProvider } from 'context/AlertContext';
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('renders wordle app', () => {
+  render(
+    <AlertProvider>
+      <App />
+    </AlertProvider>
+  );
+  const headerElement = screen.getByText(/wordle/i);
+  expect(headerElement).toBeInTheDocument();
 });
