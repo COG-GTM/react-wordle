@@ -3,33 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.3",
-    "@testing-library/react": "^12.1.4",
-    "@testing-library/user-event": "^13.5.0",
     "classnames": "^2.3.1",
-    "react": "^17.0.2",
+    "react": "^19.0.0",
     "react-countdown": "^2.3.2",
-    "react-dom": "^17.0.2",
-    "react-icons": "^4.3.1",
-    "react-scripts": "5.0.0",
-    "react-transition-group": "^4.4.2",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.0.0",
+    "react-transition-group": "^4.4.5",
     "sass": "^1.49.9",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^4.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "fix": "prettier --write src",
     "check": "prettier --check src",
     "prepare": "husky install"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -44,9 +36,16 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
     "husky": "^7.0.4",
+    "jsdom": "^25.0.0",
     "lint-staged": "^12.3.7",
-    "prettier": "2.6.1"
+    "prettier": "2.6.1",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
   },
   "lint-staged": {
     "src/*.{js,jsx,ts,tsx,json,css,scss,md}": "prettier --write --ignore-unknown"
