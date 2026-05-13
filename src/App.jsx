@@ -4,6 +4,7 @@ import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
 import Alert from 'components/Alert';
 import InfoModal from 'components/InfoModal';
+import LoginModal from 'components/LoginModal';
 import SettingModal from 'components/SettingModal';
 import StatsModal from 'components/StatsModal';
 import useLocalStorage from 'hooks/useLocalStorage';
@@ -51,6 +52,7 @@ function App() {
   const [isGameWon, setIsGameWon] = useState(false);
   const [isGameLost, setIsGameLost] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
@@ -158,6 +160,7 @@ function App() {
     <div className={styles.container}>
       <Header
         setIsInfoModalOpen={setIsInfoModalOpen}
+        setIsLoginModalOpen={setIsLoginModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
@@ -177,6 +180,10 @@ function App() {
       <InfoModal
         isOpen={isInfoModalOpen}
         onClose={() => setIsInfoModalOpen(false)}
+      />
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
       />
       <SettingModal
         isOpen={isSettingsModalOpen}

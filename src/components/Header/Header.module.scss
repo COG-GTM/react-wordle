@@ -17,8 +17,28 @@ button {
   border: none;
 }
 
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.username {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media screen and (max-width: 480px) {
   h1 {
     font-size: 2rem;
+  }
+
+  .username {
+    max-width: 60px;
+    font-size: 0.8rem;
   }
 }
