@@ -39,6 +39,24 @@
     --color-present: #06b6d4;
     --color-correct: #f97316;
   }
+
+  [data-mode='retro'] {
+    --color-absent: #1a3a1a;
+    --color-present: #b5e61d;
+    --color-correct: #00ff41;
+    --color-alert-success: #00ff41;
+    --color-alert-error: #ff3333;
+    --color-toggle: #00ff41;
+
+    --color-background: #0a0a0a;
+    --color-cell: #1a2e1a;
+    --color-key: #1a2e1a;
+    --color-key-text: #00ff41;
+    --color-key-secondary: #00ff41;
+    --color-text-primary: #00ff41;
+    --color-text-secondary: #33cc33;
+    --color-icon: #00ff41;
+  }
 }
 
 body {
@@ -50,6 +68,44 @@ body {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body[data-mode='retro'] {
+  font-family: 'VT323', 'Courier New', monospace;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 255, 65, 0.03) 0px,
+      rgba(0, 255, 65, 0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  &::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 120px rgba(0, 255, 65, 0.08);
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  * {
+    text-shadow: 0 0 5px rgba(0, 255, 65, 0.4);
+  }
 }
 
 .container {

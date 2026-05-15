@@ -34,6 +34,7 @@ function App() {
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
+  const [retroMode, setRetroMode] = useLocalStorage('retro-mode', false);
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -56,6 +57,7 @@ function App() {
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
+  const [isRetroMode, setIsRetroMode] = useState(retroMode);
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -95,10 +97,14 @@ function App() {
     if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
     else document.body.removeAttribute('data-theme');
 
-    if (isHighContrastMode)
+    if (isRetroMode) {
+      document.body.setAttribute('data-mode', 'retro');
+    } else if (isHighContrastMode) {
       document.body.setAttribute('data-mode', 'high-contrast');
-    else document.body.removeAttribute('data-mode');
-  }, [isDarkMode, isHighContrastMode]);
+    } else {
+      document.body.removeAttribute('data-mode');
+    }
+  }, [isDarkMode, isHighContrastMode, isRetroMode]);
 
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -108,6 +114,21 @@ function App() {
   const handleHighContrastMode = () => {
     setIsHighContrastMode(!isHighContrastMode);
     setHighContrast(!isHighContrastMode);
+    if (!isHighContrastMode) {
+      setIsRetroMode(false);
+      setRetroMode(false);
+    }
+  };
+
+  const handleRetroMode = () => {
+    setIsRetroMode(!isRetroMode);
+    setRetroMode(!isRetroMode);
+    if (!isRetroMode) {
+      setIsHighContrastMode(false);
+      setHighContrast(false);
+      setIsDarkMode(true);
+      setTheme('dark');
+    }
   };
 
   const handleHardMode = () => {
@@ -184,9 +205,11 @@ function App() {
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
+        isRetroMode={isRetroMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
+        setIsRetroMode={handleRetroMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}

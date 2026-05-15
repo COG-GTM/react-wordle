@@ -8,9 +8,11 @@ const SettingModal = ({
   isHardMode,
   isDarkMode,
   isHighContrastMode,
+  isRetroMode,
   setIsHardMode,
   setIsDarkMode,
   setIsHighContrastMode,
+  setIsRetroMode,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
@@ -26,6 +28,12 @@ const SettingModal = ({
         desc="For improved color vision"
         isOn={isHighContrastMode}
         onToggle={setIsHighContrastMode}
+      />
+      <Row
+        title="Retro Mode"
+        desc="Classic CRT terminal with green phosphor glow"
+        isOn={isRetroMode}
+        onToggle={setIsRetroMode}
       />
     </Modal>
   );
