@@ -75,32 +75,32 @@ export const findFirstUnusedReveal = (word, guesses) => {
     return false;
   }
 
-  const lettersLeftArray = [];
-  const guess = guesses[guesses.length - 1];
-  const statuses = getGuessStatuses(guess);
   const splitWord = word.toUpperCase().split('');
-  const splitGuess = guess.toUpperCase().split('');
 
-  for (let i = 0; i < splitGuess.length; i++) {
-    if (statuses[i] === 'correct' || statuses[i] === 'present')
-      lettersLeftArray.push(splitGuess[i]);
+  for (const guess of guesses) {
+    const statuses = getGuessStatuses(guess);
+    const splitGuess = guess.toUpperCase().split('');
+    const lettersLeftArray = [];
 
-    if (statuses[i] === 'correct' && splitWord[i] !== splitGuess[i])
-      return `Must use ${splitGuess[i]} in position ${i + 1}`;
-  }
+    for (let i = 0; i < splitGuess.length; i++) {
+      if (statuses[i] === 'correct' || statuses[i] === 'present')
+        lettersLeftArray.push(splitGuess[i]);
 
-  // check for the first unused letter, taking duplicate letters
-  // into account - see issue #198
-  let n;
-  for (const letter of splitWord) {
-    n = lettersLeftArray.indexOf(letter);
-    if (n !== -1) {
-      lettersLeftArray.splice(n, 1);
+      if (statuses[i] === 'correct' && splitWord[i] !== splitGuess[i])
+        return `Must use ${splitGuess[i]} in position ${i + 1}`;
     }
-  }
 
-  if (lettersLeftArray.length > 0)
-    return `Guess must contain ${lettersLeftArray[0]}`;
+    let n;
+    for (const letter of splitWord) {
+      n = lettersLeftArray.indexOf(letter);
+      if (n !== -1) {
+        lettersLeftArray.splice(n, 1);
+      }
+    }
+
+    if (lettersLeftArray.length > 0)
+      return `Guess must contain ${lettersLeftArray[0]}`;
+  }
 
   return false;
 };

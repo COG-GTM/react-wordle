@@ -111,6 +111,12 @@ function App() {
   };
 
   const handleHardMode = () => {
+    if (guesses.length > 0 && !isHardMode) {
+      return showAlert(
+        'Hard mode can only be enabled at the start of a round',
+        'error'
+      );
+    }
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
   };
@@ -118,10 +124,13 @@ function App() {
   const handleKeyDown = letter =>
     currentGuess.length < MAX_WORD_LENGTH &&
     !isGameWon &&
+    !isGameLost &&
     setCurrentGuess(currentGuess + letter);
 
-  const handleDelete = () =>
+  const handleDelete = () => {
+    if (isGameWon || isGameLost) return;
     setCurrentGuess(currentGuess.slice(0, currentGuess.length - 1));
+  };
 
   const handleEnter = () => {
     if (isGameWon || isGameLost) return;
