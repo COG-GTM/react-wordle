@@ -31,7 +31,7 @@ function App() {
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
-    false
+    false,
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
   const [stats, setStats] = useLocalStorage('gameStats', {
@@ -84,7 +84,7 @@ function App() {
       setIsGameLost(true);
       setTimeout(
         () => showAlert(`The word was ${solution}`, 'error', true),
-        ALERT_DELAY
+        ALERT_DELAY,
       );
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     }
