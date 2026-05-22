@@ -18,7 +18,7 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
     return () => {
       window.removeEventListener('keydown', listener);
     };
-  });
+  }, [onEnter, onDelete, onKeyDown]);
 
   const handleClick = key => {
     if (key === 'ENTER') return onEnter();

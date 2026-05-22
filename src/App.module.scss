@@ -4,35 +4,36 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  transition: background 0.2s;
+  transition: none;
 }
 
 :root {
-  --color-absent: #405069;
-  --color-present: #e0c02b;
-  --color-correct: #31ad23;
-  --color-alert-success: #3fbf62;
-  --color-alert-error: #ea4e2c;
-  --color-toggle: #3fbf62;
+  --color-absent: #306230;
+  --color-present: #8bac0f;
+  --color-correct: #9bbc0f;
+  --color-alert-success: #9bbc0f;
+  --color-alert-error: #e03030;
+  --color-toggle: #9bbc0f;
 
-  --color-background: #fff;
-  --color-cell: #afadb0;
-  --color-key: #e3e3e3;
-  --color-key-text: #333;
-  --color-key-secondary: #4f4f4f;
-  --color-text-primary: #000;
-  --color-text-secondary: #333;
-  --color-icon: #333;
+  --color-background: #0f380f;
+  --color-cell: #306230;
+  --color-key: #306230;
+  --color-key-text: #9bbc0f;
+  --color-key-secondary: #9bbc0f;
+  --color-text-primary: #9bbc0f;
+  --color-text-secondary: #8bac0f;
+  --color-icon: #9bbc0f;
+  --color-border: #9bbc0f;
 
   [data-theme='dark'] {
-    --color-background: #191919;
-    --color-cell: #444444;
-    --color-key: #4f4f4f;
-    --color-key-text: #fff;
-    --color-key-secondary: #fff;
-    --color-text-primary: #fff;
-    --color-text-secondary: #adadad;
-    --color-icon: #fff;
+    --color-background: #0f380f;
+    --color-cell: #306230;
+    --color-key: #306230;
+    --color-key-text: #9bbc0f;
+    --color-key-secondary: #9bbc0f;
+    --color-text-primary: #9bbc0f;
+    --color-text-secondary: #8bac0f;
+    --color-icon: #9bbc0f;
   }
 
   [data-mode='high-contrast'] {
@@ -43,13 +44,12 @@
 
 body {
   font-size: 62.5%;
-  font-family: 'Baloo 2', sans-serif;
+  font-family: 'Press Start 2P', monospace;
   background: var(--color-background);
-  color: #fff;
+  color: var(--color-text-primary);
   min-height: 100vh;
   scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  image-rendering: pixelated;
 }
 
 .container {
@@ -60,4 +60,6 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-left: 4px solid var(--color-border);
+  border-right: 4px solid var(--color-border);
 }

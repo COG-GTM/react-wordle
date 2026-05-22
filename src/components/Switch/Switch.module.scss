@@ -14,23 +14,22 @@
   justify-content: space-between;
   cursor: pointer;
   width: 50px;
-  height: 30px;
-  background: grey;
-  border-radius: 100px;
+  height: 28px;
+  background: #306230;
+  border-radius: 0;
+  border: 3px solid var(--color-border);
   position: relative;
-  transition: background-color 0.2s;
 
   .button {
     content: '';
     position: absolute;
     top: 3px;
     left: 3px;
-    width: 24px;
-    height: 24px;
-    border-radius: 45px;
-    transition: 0.2s;
-    background: #fff;
-    box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+    width: 20px;
+    height: 18px;
+    border-radius: 0;
+    background: #0f380f;
+    border: 2px solid var(--color-border);
   }
 }
 

@@ -1,12 +1,17 @@
 header {
   display: flex;
   justify-content: space-between;
+  border-bottom: 4px solid var(--color-border);
+  padding-bottom: 0.5rem;
 }
 
 h1 {
-  font-size: 2.3rem;
+  font-size: 1.4rem;
+  font-family: 'Press Start 2P', monospace;
   margin-left: 2.5rem;
   color: var(--color-text-primary);
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
 }
 
 button {
@@ -19,6 +24,6 @@ button {
 
 @media screen and (max-width: 480px) {
   h1 {
-    font-size: 2rem;
+    font-size: 1rem;
   }
 }

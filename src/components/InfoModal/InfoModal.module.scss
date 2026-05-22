@@ -1,6 +1,8 @@
 h3 {
-  font-size: 1rem;
+  font-size: 0.6rem;
   font-weight: 300;
+  font-family: 'Press Start 2P', monospace;
+  line-height: 1.6;
   margin-bottom: 1.5rem;
   color: var(--color-text-secondary);
 }
@@ -8,13 +10,13 @@ h3 {
 .row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-gap: 10px;
+  grid-gap: 8px;
   margin-bottom: 0.25rem;
 }
 
 @media screen and (max-width: 480px) {
   h3 {
-    font-size: 0.9rem;
+    font-size: 0.5rem;
     margin-bottom: 1rem;
   }
 }

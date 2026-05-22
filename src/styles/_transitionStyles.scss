@@ -5,7 +5,7 @@
 .fadeIn-enter-active {
   opacity: 1;
   transform: translateX(0);
-  transition: opacity 300ms, transform 300ms;
+  transition: opacity 150ms steps(3), transform 150ms steps(3);
 }
 .fadeIn-exit {
   opacity: 1;
@@ -13,7 +13,7 @@
 .fadeIn-exit-active {
   opacity: 0;
   transform: scale(0.9);
-  transition: opacity 300ms, transform 300ms;
+  transition: opacity 150ms steps(3), transform 150ms steps(3);
 }
 
 .fade-enter {
@@ -21,12 +21,12 @@
 }
 .fade-enter-active {
   opacity: 1;
-  transition: opacity 300ms;
+  transition: opacity 150ms steps(3);
 }
 .fade-exit {
   opacity: 1;
 }
 .fade-exit-active {
   opacity: 0;
-  transition: opacity 300ms;
+  transition: opacity 150ms steps(3);
 }
