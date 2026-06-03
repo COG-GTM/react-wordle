@@ -24,9 +24,9 @@
 }
 
 .success {
-  background: linear-gradient(135deg, #34d399 0%, #22c55e 100%);
+  background: var(--gradient-success);
 }
 
 .error {
-  background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+  background: var(--gradient-error);
 }
