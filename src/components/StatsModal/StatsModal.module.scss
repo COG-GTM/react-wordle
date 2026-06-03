@@ -50,15 +50,15 @@ h2 {
   }
 
   .line {
-    border-radius: 5px;
+    border-radius: 6px;
   }
 
   .blue {
-    background: #189ccc;
+    background: var(--gradient-action);
   }
 
   .gray {
-    background: #5d6061;
+    background: var(--gradient-absent);
   }
 }
 
@@ -83,14 +83,27 @@ h2 {
   }
 
   button {
-    background: #a01ef7;
+    background: var(--gradient-brand);
     width: 100%;
     display: block;
     color: #fff;
-    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 14px;
     font-size: 1.4rem;
-    font-weight: 500;
-    padding: 0.5rem 0;
+    font-weight: 700;
+    padding: 0.7rem 0;
+    box-shadow: var(--glow-brand);
+    transition: transform 0.12s ease, filter 0.15s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    &:active {
+      transform: translateY(0) scale(0.98);
+    }
   }
 }
 
