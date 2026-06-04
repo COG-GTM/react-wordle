@@ -42,7 +42,10 @@
 }
 
 // 8-bit / pixel art retro theme
-body[data-retro='true'] {
+// `:root` prefix raises specificity above the nested `:root [data-theme='dark']`
+// and `:root [data-mode='high-contrast']` rules so the retro palette wins even
+// when dark mode (the default) is active.
+:root body[data-retro='true'] {
   --color-absent: #1a1c2c;
   --color-present: #ffcc00;
   --color-correct: #38b764;
