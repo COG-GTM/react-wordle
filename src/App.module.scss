@@ -41,6 +41,38 @@
   }
 }
 
+// 8-bit / pixel art retro theme
+body[data-retro='true'] {
+  --color-absent: #1a1c2c;
+  --color-present: #ffcc00;
+  --color-correct: #38b764;
+  --color-alert-success: #38b764;
+  --color-alert-error: #ef4f4f;
+  --color-toggle: #38b764;
+
+  --color-background: #0b0b1a;
+  --color-cell: #2b2b50;
+  --color-key: #41476b;
+  --color-key-text: #fff;
+  --color-key-secondary: #f4f4f4;
+  --color-text-primary: #fff;
+  --color-text-secondary: #a0a0c0;
+  --color-icon: #fff;
+
+  --retro-border: 3px solid #000;
+  --retro-shadow: 4px 4px 0 #000;
+
+  font-family: 'Press Start 2P', monospace;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+
+  * {
+    border-radius: 0 !important;
+    transition: none;
+  }
+}
+
 body {
   font-size: 62.5%;
   font-family: 'Baloo 2', sans-serif;

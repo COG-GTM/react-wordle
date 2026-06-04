@@ -33,6 +33,7 @@ function App() {
     'high-contrast',
     false
   );
+  const [retro, setRetro] = useLocalStorage('retro', false);
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
@@ -56,6 +57,7 @@ function App() {
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
+  const [isRetroMode, setIsRetroMode] = useState(retro);
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -98,7 +100,10 @@ function App() {
     if (isHighContrastMode)
       document.body.setAttribute('data-mode', 'high-contrast');
     else document.body.removeAttribute('data-mode');
-  }, [isDarkMode, isHighContrastMode]);
+
+    if (isRetroMode) document.body.setAttribute('data-retro', 'true');
+    else document.body.removeAttribute('data-retro');
+  }, [isDarkMode, isHighContrastMode, isRetroMode]);
 
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -108,6 +113,11 @@ function App() {
   const handleHighContrastMode = () => {
     setIsHighContrastMode(!isHighContrastMode);
     setHighContrast(!isHighContrastMode);
+  };
+
+  const handleRetroMode = () => {
+    setIsRetroMode(!isRetroMode);
+    setRetro(!isRetroMode);
   };
 
   const handleHardMode = () => {
@@ -184,9 +194,11 @@ function App() {
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
+        isRetroMode={isRetroMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
+        setIsRetroMode={handleRetroMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}

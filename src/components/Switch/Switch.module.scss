@@ -20,6 +20,14 @@
   position: relative;
   transition: background-color 0.2s;
 
+  :global(body[data-retro='true']) & {
+    border: var(--retro-border);
+
+    .button {
+      border: 2px solid #000;
+    }
+  }
+
   .button {
     content: '';
     position: absolute;

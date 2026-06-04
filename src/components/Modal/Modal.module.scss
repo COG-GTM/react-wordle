@@ -18,6 +18,11 @@
   text-align: center;
   position: relative;
   max-width: 400px;
+
+  :global(body[data-retro='true']) & {
+    border: var(--retro-border);
+    box-shadow: var(--retro-shadow);
+  }
 }
 
 .close {
@@ -35,6 +40,11 @@
   font-weight: 600;
   margin-bottom: 1rem;
   color: var(--color-text-primary);
+
+  :global(body[data-retro='true']) & {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1.2rem;
+  }
 }
 
 @media screen and (max-width: 480px) {

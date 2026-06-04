@@ -25,6 +25,13 @@
   align-items: center;
   padding: 0.75rem 0.5rem;
   margin: 0 0.2rem;
+
+  :global(body[data-retro='true']) & {
+    border: var(--retro-border);
+    box-shadow: 3px 3px 0 #000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8rem;
+  }
 }
 
 .absent {
@@ -47,6 +54,10 @@
   color: var(--color-background);
   font-size: 0.9rem;
   width: auto;
+
+  :global(body[data-retro='true']) & {
+    font-size: 0.6rem;
+  }
 }
 
 @media screen and (max-width: 480px) {

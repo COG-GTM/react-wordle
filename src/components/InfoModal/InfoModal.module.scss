@@ -5,6 +5,12 @@ h3 {
   color: var(--color-text-secondary);
 }
 
+body[data-retro='true'] h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  line-height: 1.8;
+}
+
 .row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
