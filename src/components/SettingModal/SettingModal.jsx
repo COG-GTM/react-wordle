@@ -7,9 +7,11 @@ const SettingModal = ({
   onClose,
   isHardMode,
   isDarkMode,
+  isLightModeOnly,
   isHighContrastMode,
   setIsHardMode,
   setIsDarkMode,
+  setIsLightModeOnly,
   setIsHighContrastMode,
 }) => {
   return (
@@ -20,7 +22,18 @@ const SettingModal = ({
         isOn={isHardMode}
         onToggle={setIsHardMode}
       />
-      <Row title="Dark Mode" isOn={isDarkMode} onToggle={setIsDarkMode} />
+      <Row
+        title="Light Mode Only"
+        desc="Lock the app to light mode and disable Dark Mode"
+        isOn={isLightModeOnly}
+        onToggle={setIsLightModeOnly}
+      />
+      <Row
+        title="Dark Mode"
+        isOn={isDarkMode}
+        onToggle={setIsDarkMode}
+        disabled={isLightModeOnly}
+      />
       <Row
         title="High Contrast Mode"
         desc="For improved color vision"
@@ -31,7 +44,7 @@ const SettingModal = ({
   );
 };
 
-const Row = ({ title, desc, isOn, onToggle }) => {
+const Row = ({ title, desc, isOn, onToggle, disabled }) => {
   return (
     <div className={styles.row}>
       <div>
@@ -39,7 +52,7 @@ const Row = ({ title, desc, isOn, onToggle }) => {
         <h3 className={styles.desc}>{desc}</h3>
       </div>
       <div>
-        <Switch isOn={isOn} onToggle={onToggle} />
+        <Switch isOn={isOn} onToggle={onToggle} disabled={disabled} />
       </div>
     </div>
   );
