@@ -37,3 +37,8 @@
 .isOn {
   background: var(--color-toggle);
 }
+
+.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

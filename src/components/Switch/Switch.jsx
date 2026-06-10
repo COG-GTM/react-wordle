@@ -2,12 +2,13 @@ import classNames from 'classnames';
 import { useRef } from 'react';
 import styles from './Switch.module.scss';
 
-const Switch = ({ isOn, onToggle }) => {
+const Switch = ({ isOn, onToggle, disabled }) => {
   const ref = useRef();
 
   const classes = classNames({
     [styles.label]: true,
     [styles.isOn]: isOn,
+    [styles.disabled]: disabled,
   });
 
   return (
@@ -18,8 +19,12 @@ const Switch = ({ isOn, onToggle }) => {
         ref={ref}
         checked={isOn}
         onChange={onToggle}
+        disabled={disabled}
       />
-      <label className={classes} onClick={() => ref.current.click()}>
+      <label
+        className={classes}
+        onClick={() => !disabled && ref.current.click()}
+      >
         <span className={styles.button} />
       </label>
     </>

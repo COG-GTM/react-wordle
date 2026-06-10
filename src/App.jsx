@@ -29,6 +29,10 @@ function App() {
     solutionIndex: '',
   });
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
+  const [lightModeOnly, setLightModeOnly] = useLocalStorage(
+    'light-mode-only',
+    false
+  );
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
@@ -54,7 +58,10 @@ function App() {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
-  const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
+  const [isLightModeOnly, setIsLightModeOnly] = useState(lightModeOnly);
+  const [isDarkMode, setIsDarkMode] = useState(
+    theme === 'dark' && !lightModeOnly
+  );
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
 
@@ -92,17 +99,29 @@ function App() {
   }, [guesses]);
 
   useEffect(() => {
-    if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
+    if (isDarkMode && !isLightModeOnly)
+      document.body.setAttribute('data-theme', 'dark');
     else document.body.removeAttribute('data-theme');
 
     if (isHighContrastMode)
       document.body.setAttribute('data-mode', 'high-contrast');
     else document.body.removeAttribute('data-mode');
-  }, [isDarkMode, isHighContrastMode]);
+  }, [isDarkMode, isHighContrastMode, isLightModeOnly]);
 
   const handleDarkMode = () => {
+    if (isLightModeOnly) return;
     setIsDarkMode(!isDarkMode);
     setTheme(isDarkMode ? 'light' : 'dark');
+  };
+
+  const handleLightModeOnly = () => {
+    const next = !isLightModeOnly;
+    setIsLightModeOnly(next);
+    setLightModeOnly(next);
+    if (next) {
+      setIsDarkMode(false);
+      setTheme('light');
+    }
   };
 
   const handleHighContrastMode = () => {
@@ -183,9 +202,11 @@ function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
+        isLightModeOnly={isLightModeOnly}
         isHighContrastMode={isHighContrastMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
+        setIsLightModeOnly={handleLightModeOnly}
         setIsHighContrastMode={handleHighContrastMode}
       />
       <StatsModal
