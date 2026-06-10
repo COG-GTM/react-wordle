@@ -28,7 +28,7 @@ function App() {
     guesses: [],
     solutionIndex: '',
   });
-  const [theme, setTheme] = useLocalStorage('theme', 'dark');
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
@@ -93,7 +93,7 @@ function App() {
 
   useEffect(() => {
     if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
-    else document.body.removeAttribute('data-theme');
+    else document.body.setAttribute('data-theme', 'light');
 
     if (isHighContrastMode)
       document.body.setAttribute('data-mode', 'high-contrast');

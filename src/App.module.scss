@@ -24,6 +24,17 @@
   --color-text-secondary: #333;
   --color-icon: #333;
 
+  [data-theme='light'] {
+    --color-background: #fff;
+    --color-cell: #afadb0;
+    --color-key: #e3e3e3;
+    --color-key-text: #333;
+    --color-key-secondary: #4f4f4f;
+    --color-text-primary: #000;
+    --color-text-secondary: #333;
+    --color-icon: #333;
+  }
+
   [data-theme='dark'] {
     --color-background: #191919;
     --color-cell: #444444;
@@ -45,7 +56,7 @@ body {
   font-size: 62.5%;
   font-family: 'Baloo 2', sans-serif;
   background: var(--color-background);
-  color: #fff;
+  color: var(--color-text-primary);
   min-height: 100vh;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
