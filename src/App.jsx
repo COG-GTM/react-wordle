@@ -20,6 +20,7 @@ import {
   MAX_CHALLENGES,
   MAX_WORD_LENGTH,
 } from 'constants/settings';
+import { fireConfetti } from 'lib/confetti';
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
@@ -78,6 +79,7 @@ function App() {
   useEffect(() => {
     if (guesses.includes(solution.toUpperCase())) {
       setIsGameWon(true);
+      fireConfetti();
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     } else if (guesses.length === MAX_CHALLENGES) {
