@@ -160,6 +160,7 @@ function App() {
         setIsInfoModalOpen={setIsInfoModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
+        currentStreak={stats.currentStreak}
       />
       <Alert />
       <Grid
