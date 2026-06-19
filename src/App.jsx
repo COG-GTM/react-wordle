@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from 'components/Header';
 import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
 import Alert from 'components/Alert';
+import Timer from 'components/Timer';
 import InfoModal from 'components/InfoModal';
 import SettingModal from 'components/SettingModal';
 import StatsModal from 'components/StatsModal';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useAlert from 'hooks/useAlert';
+import useTimer from 'hooks/useTimer';
 import {
   solution,
   solutionIndex,
@@ -57,6 +59,8 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
+  const { elapsedTime, startTimer, stopTimer } = useTimer();
+  const timerStartedRef = useRef(false);
 
   // Show welcome modal
   useEffect(() => {
@@ -78,10 +82,12 @@ function App() {
   useEffect(() => {
     if (guesses.includes(solution.toUpperCase())) {
       setIsGameWon(true);
+      stopTimer();
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     } else if (guesses.length === MAX_CHALLENGES) {
       setIsGameLost(true);
+      stopTimer();
       setTimeout(
         () => showAlert(`The word was ${solution}`, 'error', true),
         ALERT_DELAY
@@ -115,10 +121,15 @@ function App() {
     setHardMode(!isHardMode);
   };
 
-  const handleKeyDown = letter =>
+  const handleKeyDown = letter => {
+    if (!timerStartedRef.current && !isGameWon && !isGameLost) {
+      startTimer();
+      timerStartedRef.current = true;
+    }
     currentGuess.length < MAX_WORD_LENGTH &&
-    !isGameWon &&
-    setCurrentGuess(currentGuess + letter);
+      !isGameWon &&
+      setCurrentGuess(currentGuess + letter);
+  };
 
   const handleDelete = () =>
     setCurrentGuess(currentGuess.slice(0, currentGuess.length - 1));
@@ -162,6 +173,7 @@ function App() {
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
       <Alert />
+      <Timer elapsedTime={elapsedTime} />
       <Grid
         currentGuess={currentGuess}
         guesses={guesses}
@@ -198,6 +210,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        elapsedTime={elapsedTime}
       />
     </div>
   );

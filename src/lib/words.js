@@ -137,13 +137,21 @@ const getSuccessRate = gameStats => {
   );
 };
 
-export const shareStatus = (guesses, isGameLost, isHardMode) => {
+export const formatTime = seconds => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+};
+
+export const shareStatus = (guesses, isGameLost, isHardMode, elapsedTime) => {
+  const timeLine =
+    elapsedTime != null ? `Time: ${formatTime(elapsedTime)}\n` : '';
   const textToShare =
     `Wordle Game
 #${solutionIndex} 
 ${isGameLost ? 'X' : guesses.length}/${MAX_CHALLENGES} 
 ${isHardMode ? 'Hard Mode' : ''}
-\n` + generateEmojiGrid(guesses);
+${timeLine}\n` + generateEmojiGrid(guesses);
 
   navigator.clipboard.writeText(textToShare);
 };
