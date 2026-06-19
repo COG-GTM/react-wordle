@@ -8,9 +8,11 @@ const SettingModal = ({
   isHardMode,
   isDarkMode,
   isHighContrastMode,
+  isTritanopiaMode,
   setIsHardMode,
   setIsDarkMode,
   setIsHighContrastMode,
+  setIsTritanopiaMode,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
@@ -26,6 +28,12 @@ const SettingModal = ({
         desc="For improved color vision"
         isOn={isHighContrastMode}
         onToggle={setIsHighContrastMode}
+      />
+      <Row
+        title="Tritanopia Mode"
+        desc="Alternative palette for blue-yellow color vision"
+        isOn={isTritanopiaMode}
+        onToggle={setIsTritanopiaMode}
       />
     </Modal>
   );
