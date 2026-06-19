@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from 'components/Header';
 import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
+import KeyboardHeatmap from 'components/KeyboardHeatmap';
 import Alert from 'components/Alert';
 import InfoModal from 'components/InfoModal';
 import SettingModal from 'components/SettingModal';
@@ -34,6 +35,7 @@ function App() {
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
+  const [heatmapMode, setHeatmapMode] = useLocalStorage('heatmap-mode', false);
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -56,6 +58,7 @@ function App() {
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
+  const [isHeatmapMode, setIsHeatmapMode] = useState(heatmapMode);
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -115,6 +118,11 @@ function App() {
     setHardMode(!isHardMode);
   };
 
+  const handleHeatmapMode = () => {
+    setIsHeatmapMode(!isHeatmapMode);
+    setHeatmapMode(!isHeatmapMode);
+  };
+
   const handleKeyDown = letter =>
     currentGuess.length < MAX_WORD_LENGTH &&
     !isGameWon &&
@@ -168,12 +176,15 @@ function App() {
         isJiggling={isJiggling}
         setIsJiggling={setIsJiggling}
       />
-      <Keyboard
-        onEnter={handleEnter}
-        onDelete={handleDelete}
-        onKeyDown={handleKeyDown}
-        guesses={guesses}
-      />
+      <div style={{ position: 'relative' }}>
+        <Keyboard
+          onEnter={handleEnter}
+          onDelete={handleDelete}
+          onKeyDown={handleKeyDown}
+          guesses={guesses}
+        />
+        {isHeatmapMode && <KeyboardHeatmap guesses={guesses} />}
+      </div>
       <InfoModal
         isOpen={isInfoModalOpen}
         onClose={() => setIsInfoModalOpen(false)}
@@ -184,9 +195,11 @@ function App() {
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
+        isHeatmapMode={isHeatmapMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
+        setIsHeatmapMode={handleHeatmapMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}

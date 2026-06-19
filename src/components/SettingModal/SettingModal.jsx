@@ -8,9 +8,11 @@ const SettingModal = ({
   isHardMode,
   isDarkMode,
   isHighContrastMode,
+  isHeatmapMode,
   setIsHardMode,
   setIsDarkMode,
   setIsHighContrastMode,
+  setIsHeatmapMode,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
@@ -26,6 +28,12 @@ const SettingModal = ({
         desc="For improved color vision"
         isOn={isHighContrastMode}
         onToggle={setIsHighContrastMode}
+      />
+      <Row
+        title="Keyboard Heatmap"
+        desc="Show letter frequency overlay on keyboard"
+        isOn={isHeatmapMode}
+        onToggle={setIsHeatmapMode}
       />
     </Modal>
   );
