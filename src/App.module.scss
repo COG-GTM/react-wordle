@@ -39,6 +39,11 @@
     --color-present: #06b6d4;
     --color-correct: #f97316;
   }
+
+  [data-mode='tritanopia'] {
+    --color-present: #d55e00;
+    --color-correct: #009e73;
+  }
 }
 
 body {

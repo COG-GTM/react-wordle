@@ -33,6 +33,7 @@ function App() {
     'high-contrast',
     false
   );
+  const [tritanopia, setTritanopia] = useLocalStorage('tritanopia', false);
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
@@ -56,6 +57,7 @@ function App() {
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
+  const [isTritanopiaMode, setIsTritanopiaMode] = useState(tritanopia);
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -97,8 +99,10 @@ function App() {
 
     if (isHighContrastMode)
       document.body.setAttribute('data-mode', 'high-contrast');
+    else if (isTritanopiaMode)
+      document.body.setAttribute('data-mode', 'tritanopia');
     else document.body.removeAttribute('data-mode');
-  }, [isDarkMode, isHighContrastMode]);
+  }, [isDarkMode, isHighContrastMode, isTritanopiaMode]);
 
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -106,8 +110,23 @@ function App() {
   };
 
   const handleHighContrastMode = () => {
-    setIsHighContrastMode(!isHighContrastMode);
-    setHighContrast(!isHighContrastMode);
+    const next = !isHighContrastMode;
+    setIsHighContrastMode(next);
+    setHighContrast(next);
+    if (next) {
+      setIsTritanopiaMode(false);
+      setTritanopia(false);
+    }
+  };
+
+  const handleTritanopiaMode = () => {
+    const next = !isTritanopiaMode;
+    setIsTritanopiaMode(next);
+    setTritanopia(next);
+    if (next) {
+      setIsHighContrastMode(false);
+      setHighContrast(false);
+    }
   };
 
   const handleHardMode = () => {
@@ -184,9 +203,11 @@ function App() {
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
+        isTritanopiaMode={isTritanopiaMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
+        setIsTritanopiaMode={handleTritanopiaMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
