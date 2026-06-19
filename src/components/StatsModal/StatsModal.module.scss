@@ -1,3 +1,20 @@
+@keyframes growBar {
+  from {
+    width: 0%;
+  }
+}
+
+@keyframes countUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .statsBar {
   display: flex;
   align-items: center;
@@ -14,6 +31,10 @@
       font-weight: 500;
       margin: 0;
       color: var(--color-text-primary);
+    }
+
+    .valueAnimated {
+      animation: countUp 0.4s ease-out both;
     }
 
     .label {
@@ -51,6 +72,10 @@ h2 {
 
   .line {
     border-radius: 5px;
+  }
+
+  .lineAnimated {
+    animation: growBar 0.6s ease-out both;
   }
 
   .blue {

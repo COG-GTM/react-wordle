@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
@@ -15,6 +16,14 @@ const StatsModal = ({
   guesses,
   showAlert,
 }) => {
+  const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => {
+    if (isOpen) {
+      setAnimKey(k => k + 1);
+    }
+  }, [isOpen]);
+
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
@@ -22,14 +31,14 @@ const StatsModal = ({
 
   return (
     <Modal title="Statistics" isOpen={isOpen} onClose={onClose}>
-      <div className={styles.statsBar}>
+      <div className={styles.statsBar} key={`stats-${animKey}`}>
         <StatItem label="Played" value={gameStats.totalGames} />
         <StatItem label="Win Rate %" value={gameStats.successRate} />
         <StatItem label="Current Streak" value={gameStats.currentStreak} />
         <StatItem label="Best Streak" value={gameStats.bestStreak} />
       </div>
       <h2>Guess Distribution</h2>
-      <div className={styles.winDistribution}>
+      <div className={styles.winDistribution} key={`dist-${animKey}`}>
         {gameStats.winDistribution.map((value, i) => (
           <Progress
             key={i}
@@ -37,6 +46,7 @@ const StatsModal = ({
             currentDayStatRow={numberOfGuessesMade === i + 1}
             size={90 * (value / Math.max(...gameStats.winDistribution))}
             label={String(value)}
+            staggerDelay={i * 0.1}
           />
         ))}
       </div>
@@ -60,17 +70,20 @@ const StatsModal = ({
 };
 
 const StatItem = ({ label, value }) => {
+  const valueClasses = classNames(styles.value, styles.valueAnimated);
+
   return (
     <div className={styles.statItem}>
-      <h3 className={styles.value}>{value}</h3>
+      <h3 className={valueClasses}>{value}</h3>
       <span className={styles.label}>{label}</span>
     </div>
   );
 };
 
-const Progress = ({ index, label, size, currentDayStatRow }) => {
+const Progress = ({ index, label, size, currentDayStatRow, staggerDelay }) => {
   const classes = classNames({
     [styles.line]: true,
+    [styles.lineAnimated]: true,
     [styles.blue]: currentDayStatRow,
     [styles.gray]: !currentDayStatRow,
   });
@@ -79,7 +92,13 @@ const Progress = ({ index, label, size, currentDayStatRow }) => {
     <div className={styles.progress}>
       <div className={styles.index}>{index + 1}</div>
       <div className={styles.row}>
-        <div className={classes} style={{ width: `${8 + size}%` }}>
+        <div
+          className={classes}
+          style={{
+            width: `${8 + size}%`,
+            animationDelay: `${staggerDelay}s`,
+          }}
+        >
           {label}
         </div>
       </div>
