@@ -34,6 +34,7 @@ function App() {
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
+  const [heatmapMode, setHeatmapMode] = useLocalStorage('heatmap-mode', false);
   const [stats, setStats] = useLocalStorage('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
@@ -56,6 +57,7 @@ function App() {
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
+  const [isHeatmapMode, setIsHeatmapMode] = useState(heatmapMode);
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -113,6 +115,11 @@ function App() {
   const handleHardMode = () => {
     setIsHardMode(!isHardMode);
     setHardMode(!isHardMode);
+  };
+
+  const handleHeatmapMode = () => {
+    setIsHeatmapMode(!isHeatmapMode);
+    setHeatmapMode(!isHeatmapMode);
   };
 
   const handleKeyDown = letter =>
@@ -173,6 +180,7 @@ function App() {
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
         guesses={guesses}
+        isHeatmapMode={isHeatmapMode}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -187,6 +195,8 @@ function App() {
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
+        isHeatmapMode={isHeatmapMode}
+        setIsHeatmapMode={handleHeatmapMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
