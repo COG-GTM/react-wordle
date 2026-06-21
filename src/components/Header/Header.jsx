@@ -1,10 +1,12 @@
 import { BsBarChart, BsGear, BsInfoCircle } from 'react-icons/bs';
+import StreakBadge from 'components/StreakBadge';
 import './Header.module.scss';
 
 const Header = ({
   setIsInfoModalOpen,
   setIsStatsModalOpen,
   setIsSettingsModalOpen,
+  stats,
 }) => {
   return (
     <header>
@@ -13,7 +15,10 @@ const Header = ({
           <BsInfoCircle size="1.6rem" color="var(--color-icon)" />
         </button>
       </div>
-      <h1>WORDLE</h1>
+      <h1>
+        WORDLE
+        <StreakBadge streak={stats.currentStreak} />
+      </h1>
       <div>
         <button onClick={() => setIsStatsModalOpen(true)}>
           <BsBarChart size="1.6rem" color="var(--color-icon)" />

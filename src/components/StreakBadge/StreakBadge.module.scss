@@ -1,0 +1,33 @@
+.streakBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.flame {
+  flex-shrink: 0;
+}
+
+.flamePulse {
+  flex-shrink: 0;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.count {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+}
