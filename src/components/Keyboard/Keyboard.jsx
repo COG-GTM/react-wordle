@@ -1,10 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import { getStatuses } from 'lib/words';
+import { computeLetterFrequencies } from 'lib/heatmap';
+import KeyboardHeatmap from 'components/KeyboardHeatmap';
 import styles from './Keyboard.module.scss';
 
-const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
+const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses, isHeatmapMode }) => {
   const charStatuses = getStatuses(guesses);
+  const frequencies = useMemo(
+    () => (isHeatmapMode ? computeLetterFrequencies(guesses) : null),
+    [isHeatmapMode, guesses]
+  );
 
   useEffect(() => {
     const listener = e => {
@@ -36,6 +42,7 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
             value={char}
             status={charStatuses[char]}
             onClick={handleClick}
+            frequency={frequencies ? frequencies[char] : null}
           />
         ))}
       </div>
@@ -46,6 +53,7 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
             value={char}
             status={charStatuses[char]}
             onClick={handleClick}
+            frequency={frequencies ? frequencies[char] : null}
           />
         ))}
       </div>
@@ -57,6 +65,7 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
             value={char}
             status={charStatuses[char]}
             onClick={handleClick}
+            frequency={frequencies ? frequencies[char] : null}
           />
         ))}
         <Key value="ENTER" onClick={handleClick} status="action" />
@@ -65,7 +74,7 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
   );
 };
 
-const Key = ({ value, status, onClick }) => {
+const Key = ({ value, status, onClick, frequency }) => {
   const classes = classNames({
     [styles.key]: true,
     [styles.absent]: status === 'absent',
@@ -77,6 +86,7 @@ const Key = ({ value, status, onClick }) => {
   return (
     <button className={classes} onClick={() => onClick(value)}>
       {value}
+      {frequency != null && <KeyboardHeatmap frequency={frequency} />}
     </button>
   );
 };
