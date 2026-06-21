@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from 'components/Header';
 import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
@@ -6,8 +6,10 @@ import Alert from 'components/Alert';
 import InfoModal from 'components/InfoModal';
 import SettingModal from 'components/SettingModal';
 import StatsModal from 'components/StatsModal';
+import Timer from 'components/Timer';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useAlert from 'hooks/useAlert';
+import useTimer from 'hooks/useTimer';
 import {
   solution,
   solutionIndex,
@@ -57,6 +59,12 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
+  const {
+    elapsedTime,
+    start: startTimer,
+    stop: stopTimer,
+    reset: resetTimer,
+  } = useTimer();
 
   // Show welcome modal
   useEffect(() => {
@@ -78,10 +86,12 @@ function App() {
   useEffect(() => {
     if (guesses.includes(solution.toUpperCase())) {
       setIsGameWon(true);
+      stopTimer();
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     } else if (guesses.length === MAX_CHALLENGES) {
       setIsGameLost(true);
+      stopTimer();
       setTimeout(
         () => showAlert(`The word was ${solution}`, 'error', true),
         ALERT_DELAY
@@ -90,6 +100,12 @@ function App() {
     }
     // eslint-disable-next-line
   }, [guesses]);
+
+  // Reset timer when the puzzle changes (new day)
+  useEffect(() => {
+    resetTimer();
+    // eslint-disable-next-line
+  }, [solutionIndex]);
 
   useEffect(() => {
     if (isDarkMode) document.body.setAttribute('data-theme', 'dark');
@@ -115,10 +131,15 @@ function App() {
     setHardMode(!isHardMode);
   };
 
-  const handleKeyDown = letter =>
-    currentGuess.length < MAX_WORD_LENGTH &&
-    !isGameWon &&
-    setCurrentGuess(currentGuess + letter);
+  const handleKeyDown = useCallback(
+    letter => {
+      if (currentGuess.length < MAX_WORD_LENGTH && !isGameWon) {
+        startTimer();
+        setCurrentGuess(currentGuess + letter);
+      }
+    },
+    [currentGuess, isGameWon, startTimer]
+  );
 
   const handleDelete = () =>
     setCurrentGuess(currentGuess.slice(0, currentGuess.length - 1));
@@ -162,6 +183,7 @@ function App() {
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
       <Alert />
+      <Timer elapsedTime={elapsedTime} />
       <Grid
         currentGuess={currentGuess}
         guesses={guesses}
@@ -198,6 +220,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        elapsedTime={elapsedTime}
       />
     </div>
   );
