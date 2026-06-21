@@ -15,6 +15,7 @@ import {
   findFirstUnusedReveal,
   addStatsForCompletedGame,
 } from 'lib/words';
+import { fireConfetti } from 'lib/confetti';
 import {
   ALERT_DELAY,
   MAX_CHALLENGES,
@@ -78,6 +79,7 @@ function App() {
   useEffect(() => {
     if (guesses.includes(solution.toUpperCase())) {
       setIsGameWon(true);
+      fireConfetti();
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     } else if (guesses.length === MAX_CHALLENGES) {
