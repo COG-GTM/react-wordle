@@ -6,12 +6,19 @@ import styles from './Modal.module.scss';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   const ref = useRef();
+  const containerRef = useRef(null);
 
   useOnClickOutside(ref, onClose);
 
   return (
-    <CSSTransition in={isOpen} timeout={300} classNames={'fade'} unmountOnExit>
-      <div className={styles.modalContainer}>
+    <CSSTransition
+      in={isOpen}
+      timeout={300}
+      classNames={'fade'}
+      unmountOnExit
+      nodeRef={containerRef}
+    >
+      <div className={styles.modalContainer} ref={containerRef}>
         <div className={styles.modal} ref={ref}>
           <button className={styles.close} onClick={onClose}>
             <RiCloseCircleLine size="1.6rem" color="var(--color-icon)" />
