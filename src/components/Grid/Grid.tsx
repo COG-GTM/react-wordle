@@ -5,10 +5,22 @@ import { getGuessStatuses } from 'lib/words';
 import { MAX_CHALLENGES, MAX_WORD_LENGTH } from 'constants/settings';
 import styles from './Grid.module.scss';
 
-const Grid = ({ currentGuess, guesses, isJiggling, setIsJiggling }) => {
+type GridProps = {
+  currentGuess: string;
+  guesses: string[];
+  isJiggling: boolean;
+  setIsJiggling: (isJiggling: boolean) => void;
+};
+
+const Grid = ({
+  currentGuess,
+  guesses,
+  isJiggling,
+  setIsJiggling,
+}: GridProps) => {
   const empties =
     MAX_CHALLENGES > guesses.length
-      ? Array(MAX_CHALLENGES - guesses.length - 1).fill()
+      ? new Array(MAX_CHALLENGES - guesses.length - 1).fill('')
       : [];
 
   useEffect(() => {
@@ -33,9 +45,15 @@ const Grid = ({ currentGuess, guesses, isJiggling, setIsJiggling }) => {
   );
 };
 
-const CurrentRow = ({ guess, isJiggling }) => {
+const CurrentRow = ({
+  guess,
+  isJiggling,
+}: {
+  guess: string;
+  isJiggling: boolean;
+}) => {
   const emptyCells = Array(MAX_WORD_LENGTH - guess.length).fill('');
-  const cells = [...guess, ...emptyCells];
+  const cells = [...guess.split(''), ...emptyCells];
 
   const classes = classNames({
     [styles.row]: true,
@@ -51,7 +69,7 @@ const CurrentRow = ({ guess, isJiggling }) => {
   );
 };
 
-const CompletedRow = ({ guess }) => {
+const CompletedRow = ({ guess }: { guess: string }) => {
   const cells = guess.split('');
   const statuses = getGuessStatuses(guess);
 
@@ -71,7 +89,7 @@ const CompletedRow = ({ guess }) => {
 };
 
 const EmptyRow = () => {
-  const cells = Array(MAX_WORD_LENGTH).fill();
+  const cells = new Array(MAX_WORD_LENGTH).fill('');
 
   return (
     <div className={styles.row}>

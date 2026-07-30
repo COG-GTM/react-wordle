@@ -1,11 +1,17 @@
 import { BsBarChart, BsGear, BsInfoCircle } from 'react-icons/bs';
 import './Header.module.scss';
 
+type HeaderProps = {
+  setIsInfoModalOpen: (isOpen: boolean) => void;
+  setIsStatsModalOpen: (isOpen: boolean) => void;
+  setIsSettingsModalOpen: (isOpen: boolean) => void;
+};
+
 const Header = ({
   setIsInfoModalOpen,
   setIsStatsModalOpen,
   setIsSettingsModalOpen,
-}) => {
+}: HeaderProps) => {
   return (
     <header>
       <div>

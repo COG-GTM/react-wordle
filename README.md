@@ -1,6 +1,6 @@
 # React Wordle
 
-Wordle game clone created using React, SASS
+Wordle game clone created using React, TypeScript, SASS
 
 ![Wordle Game Clone Screen Capture](public/Screenshot.png)
 

@@ -1,13 +1,21 @@
 import { useEffect } from 'react';
 import classNames from 'classnames';
 import { getStatuses } from 'lib/words';
+import { CharStatus } from 'types';
 import styles from './Keyboard.module.scss';
 
-const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
+type KeyboardProps = {
+  onEnter: () => void;
+  onDelete: () => void;
+  onKeyDown: (letter: string) => void;
+  guesses: string[];
+};
+
+const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }: KeyboardProps) => {
   const charStatuses = getStatuses(guesses);
 
   useEffect(() => {
-    const listener = e => {
+    const listener = (e: KeyboardEvent) => {
       const key = e.key.toUpperCase();
       if (key === 'BACKSPACE') return onDelete();
       if (key === 'ENTER') return onEnter();
@@ -20,7 +28,7 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
     };
   });
 
-  const handleClick = key => {
+  const handleClick = (key: string) => {
     if (key === 'ENTER') return onEnter();
     if (key === 'DELETE') return onDelete();
 
@@ -65,7 +73,13 @@ const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
   );
 };
 
-const Key = ({ value, status, onClick }) => {
+type KeyProps = {
+  value: string;
+  status?: CharStatus | 'action';
+  onClick: (value: string) => void;
+};
+
+const Key = ({ value, status, onClick }: KeyProps) => {
   const classes = classNames({
     [styles.key]: true,
     [styles.absent]: status === 'absent',

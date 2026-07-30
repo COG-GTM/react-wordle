@@ -20,21 +20,25 @@ import {
   MAX_CHALLENGES,
   MAX_WORD_LENGTH,
 } from 'constants/settings';
+import { BoardState, GameStats } from 'types';
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
 function App() {
-  const [boardState, setBoardState] = useLocalStorage('boardState', {
-    guesses: [],
-    solutionIndex: '',
-  });
+  const [boardState, setBoardState] = useLocalStorage<BoardState>(
+    'boardState',
+    {
+      guesses: [],
+      solutionIndex: '',
+    }
+  );
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
-  const [stats, setStats] = useLocalStorage('gameStats', {
+  const [stats, setStats] = useLocalStorage<GameStats>('gameStats', {
     winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
     gamesFailed: 0,
     currentStreak: 0,
@@ -43,7 +47,7 @@ function App() {
     successRate: 0,
   });
   const [currentGuess, setCurrentGuess] = useState('');
-  const [guesses, setGuesses] = useState(() => {
+  const [guesses, setGuesses] = useState<string[]>(() => {
     if (boardState.solutionIndex !== solutionIndex) return [];
     return boardState.guesses;
   });
@@ -115,7 +119,7 @@ function App() {
     setHardMode(!isHardMode);
   };
 
-  const handleKeyDown = letter =>
+  const handleKeyDown = (letter: string) =>
     currentGuess.length < MAX_WORD_LENGTH &&
     !isGameWon &&
     setCurrentGuess(currentGuess + letter);

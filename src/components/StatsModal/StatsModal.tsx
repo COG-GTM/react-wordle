@@ -3,6 +3,20 @@ import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
 import { shareStatus, tomorrow } from 'lib/words';
+import { AlertContextValue } from 'context/AlertContext';
+import { GameStats } from 'types';
+
+type StatsModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  gameStats: GameStats;
+  numberOfGuessesMade: number;
+  isGameWon: boolean;
+  isGameLost: boolean;
+  isHardMode: boolean;
+  guesses: string[];
+  showAlert: AlertContextValue['showAlert'];
+};
 
 const StatsModal = ({
   isOpen,
@@ -14,7 +28,7 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
-}) => {
+}: StatsModalProps) => {
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
@@ -59,7 +73,7 @@ const StatsModal = ({
   );
 };
 
-const StatItem = ({ label, value }) => {
+const StatItem = ({ label, value }: { label: string; value: number }) => {
   return (
     <div className={styles.statItem}>
       <h3 className={styles.value}>{value}</h3>
@@ -68,7 +82,14 @@ const StatItem = ({ label, value }) => {
   );
 };
 
-const Progress = ({ index, label, size, currentDayStatRow }) => {
+type ProgressProps = {
+  index: number;
+  label: string;
+  size: number;
+  currentDayStatRow: boolean;
+};
+
+const Progress = ({ index, label, size, currentDayStatRow }: ProgressProps) => {
   const classes = classNames({
     [styles.line]: true,
     [styles.blue]: currentDayStatRow,

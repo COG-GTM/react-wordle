@@ -1,19 +1,20 @@
 import { MAX_CHALLENGES } from 'constants/settings';
 import { VALID_GUESSES } from 'constants/validGuesses';
 import { WORDS } from 'constants/wordList';
+import { CharStatus, CharStatusMap, GameStats } from 'types';
 
-export const isWordValid = word => {
+export const isWordValid = (word: string): boolean => {
   return (
     VALID_GUESSES.includes(word.toLowerCase()) ||
     WORDS.includes(word.toLowerCase())
   );
 };
 
-export const getGuessStatuses = guess => {
+export const getGuessStatuses = (guess: string): CharStatus[] => {
   const splitGuess = guess.toLowerCase().split('');
   const splitSolution = solution.split('');
 
-  const statuses = [];
+  const statuses: CharStatus[] = [];
   const solutionCharsTaken = splitSolution.map(_ => false);
 
   // handle all correct cases first
@@ -52,8 +53,8 @@ export const getGuessStatuses = guess => {
   return statuses;
 };
 
-export const getStatuses = guesses => {
-  const charObj = {};
+export const getStatuses = (guesses: string[]): CharStatusMap => {
+  const charObj: CharStatusMap = {};
   const splitSolution = solution.toUpperCase().split('');
 
   guesses.forEach(word => {
@@ -70,7 +71,10 @@ export const getStatuses = guesses => {
 // build a set of previously revealed letters - present and correct
 // guess must use correct letters in that space and any other revealed letters
 // also check if all revealed instances of a letter are used (i.e. two C's)
-export const findFirstUnusedReveal = (word, guesses) => {
+export const findFirstUnusedReveal = (
+  word: string,
+  guesses: string[]
+): string | false => {
   if (guesses.length === 0) {
     return false;
   }
@@ -91,7 +95,7 @@ export const findFirstUnusedReveal = (word, guesses) => {
 
   // check for the first unused letter, taking duplicate letters
   // into account - see issue #198
-  let n;
+  let n: number;
   for (const letter of splitWord) {
     n = lettersLeftArray.indexOf(letter);
     if (n !== -1) {
@@ -105,7 +109,10 @@ export const findFirstUnusedReveal = (word, guesses) => {
   return false;
 };
 
-export const addStatsForCompletedGame = (gameStats, count) => {
+export const addStatsForCompletedGame = (
+  gameStats: GameStats,
+  count: number
+): GameStats => {
   // Count is number of incorrect guesses before end.
   const stats = { ...gameStats };
 
@@ -129,7 +136,7 @@ export const addStatsForCompletedGame = (gameStats, count) => {
   return stats;
 };
 
-const getSuccessRate = gameStats => {
+const getSuccessRate = (gameStats: GameStats): number => {
   const { totalGames, gamesFailed } = gameStats;
 
   return Math.round(
@@ -137,7 +144,11 @@ const getSuccessRate = gameStats => {
   );
 };
 
-export const shareStatus = (guesses, isGameLost, isHardMode) => {
+export const shareStatus = (
+  guesses: string[],
+  isGameLost: boolean,
+  isHardMode: boolean
+): void => {
   const textToShare =
     `Wordle Game
 #${solutionIndex} 
@@ -148,7 +159,7 @@ ${isHardMode ? 'Hard Mode' : ''}
   navigator.clipboard.writeText(textToShare);
 };
 
-export const generateEmojiGrid = guesses => {
+export const generateEmojiGrid = (guesses: string[]): string => {
   return guesses
     .map(guess => {
       const status = getGuessStatuses(guess);
@@ -170,7 +181,11 @@ export const generateEmojiGrid = guesses => {
     .join('\n');
 };
 
-export const getWordOfDay = () => {
+export const getWordOfDay = (): {
+  solution: string;
+  solutionIndex: number;
+  tomorrow: number;
+} => {
   // January 1, 2022 Game Epoch
   const epochMs = new Date(2022, 0).valueOf();
   const now = Date.now();
