@@ -1,6 +1,6 @@
 export type CharStatus = 'absent' | 'present' | 'correct';
 
-export type CharStatusMap = Record<string, CharStatus>;
+export type CharStatusMap = Partial<Record<string, CharStatus>>;
 
 export type AlertStatus = 'success' | 'error';
 
