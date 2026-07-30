@@ -1,11 +1,18 @@
-import { useRef } from 'react';
+import { ReactNode, useRef } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import useOnClickOutside from 'hooks/useOnClickOutside';
 import { RiCloseCircleLine } from 'react-icons/ri';
 import styles from './Modal.module.scss';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
-  const ref = useRef();
+type ModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+};
+
+const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+  const ref = useRef<HTMLDivElement>(null);
 
   useOnClickOutside(ref, onClose);
 

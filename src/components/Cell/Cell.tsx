@@ -1,7 +1,15 @@
 import classNames from 'classnames';
+import { CharStatus } from 'types';
 import styles from './Cell.module.scss';
 
-const Cell = ({ value, status, position, isCompleted }) => {
+type CellProps = {
+  value?: string;
+  status?: CharStatus;
+  position?: number;
+  isCompleted?: boolean;
+};
+
+const Cell = ({ value, status, position = 0, isCompleted }: CellProps) => {
   const classes = classNames({
     [styles.cell]: true,
     [styles.absent]: status === 'absent',

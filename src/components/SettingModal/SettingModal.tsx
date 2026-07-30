@@ -2,6 +2,17 @@ import Modal from 'components/Modal';
 import Switch from 'components/Switch';
 import styles from './SettingModal.module.scss';
 
+type SettingModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  isHardMode: boolean;
+  isDarkMode: boolean;
+  isHighContrastMode: boolean;
+  setIsHardMode: () => void;
+  setIsDarkMode: () => void;
+  setIsHighContrastMode: () => void;
+};
+
 const SettingModal = ({
   isOpen,
   onClose,
@@ -11,7 +22,7 @@ const SettingModal = ({
   setIsHardMode,
   setIsDarkMode,
   setIsHighContrastMode,
-}) => {
+}: SettingModalProps) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
       <Row
@@ -31,7 +42,14 @@ const SettingModal = ({
   );
 };
 
-const Row = ({ title, desc, isOn, onToggle }) => {
+type RowProps = {
+  title: string;
+  desc?: string;
+  isOn: boolean;
+  onToggle: () => void;
+};
+
+const Row = ({ title, desc, isOn, onToggle }: RowProps) => {
   return (
     <div className={styles.row}>
       <div>

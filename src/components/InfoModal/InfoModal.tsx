@@ -2,7 +2,12 @@ import Modal from 'components/Modal';
 import Cell from 'components/Cell';
 import styles from './InfoModal.module.scss';
 
-const InfoModal = ({ isOpen, onClose }) => {
+type InfoModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+const InfoModal = ({ isOpen, onClose }: InfoModalProps) => {
   return (
     <Modal title={'How to play'} isOpen={isOpen} onClose={onClose}>
       <h3>
