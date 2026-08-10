@@ -30,11 +30,11 @@ const InfoModal = ({ isOpen, onClose }) => {
       <h3>The letter I is in the word but in the wrong spot.</h3>
       <div className={styles.row}>
         <Cell value="V" />
-        <Cell value="A" />
-        <Cell value="G" />
+        <Cell value="I" />
+        <Cell value="R" />
+        <Cell value="T" />
         <Cell value="U" status="absent" isCompleted />
         <Cell value="E" />
-        <Cell value="S" />
       </div>
       <h3>The letter U is not in the word in any spot.</h3>
     </Modal>
