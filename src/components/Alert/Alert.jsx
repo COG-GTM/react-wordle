@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import useAlert from 'hooks/useAlert';
 import classNames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
@@ -5,6 +6,7 @@ import styles from './Alert.module.scss';
 
 const Alert = () => {
   const { message, status, isVisible } = useAlert();
+  const nodeRef = useRef(null);
 
   const classes = classNames({
     [styles.alert]: true,
@@ -18,9 +20,12 @@ const Alert = () => {
         in={isVisible}
         timeout={300}
         classNames={'fadeIn'}
+        nodeRef={nodeRef}
         unmountOnExit
       >
-        <span className={classes}>{message}</span>
+        <span className={classes} ref={nodeRef}>
+          {message}
+        </span>
       </CSSTransition>
     </div>
   );
