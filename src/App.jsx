@@ -7,6 +7,7 @@ import InfoModal from 'components/InfoModal';
 import SettingModal from 'components/SettingModal';
 import StatsModal from 'components/StatsModal';
 import useLocalStorage from 'hooks/useLocalStorage';
+import usePrefersDarkMode from 'hooks/usePrefersDarkMode';
 import useAlert from 'hooks/useAlert';
 import {
   solution,
@@ -28,7 +29,8 @@ function App() {
     guesses: [],
     solutionIndex: '',
   });
-  const [theme, setTheme] = useLocalStorage('theme', 'dark');
+  // null means no explicit choice, so the system setting is followed
+  const [theme, setTheme] = useLocalStorage('theme', null);
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
@@ -54,8 +56,9 @@ function App() {
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
-  const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
+  const prefersDarkMode = usePrefersDarkMode();
+  const isDarkMode = theme ? theme === 'dark' : prefersDarkMode;
   const { showAlert } = useAlert();
 
   // Show welcome modal
@@ -100,10 +103,7 @@ function App() {
     else document.body.removeAttribute('data-mode');
   }, [isDarkMode, isHighContrastMode]);
 
-  const handleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    setTheme(isDarkMode ? 'light' : 'dark');
-  };
+  const handleDarkMode = () => setTheme(isDarkMode ? 'light' : 'dark');
 
   const handleHighContrastMode = () => {
     setIsHighContrastMode(!isHighContrastMode);
