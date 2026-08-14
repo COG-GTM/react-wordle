@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
-import { shareStatus, tomorrow } from 'lib/words';
+import { shareStatus } from 'lib/words';
 
 const StatsModal = ({
   isOpen,
@@ -12,16 +12,25 @@ const StatsModal = ({
   isGameWon,
   isGameLost,
   isHardMode,
+  isUnlimited,
+  onNewGame,
   guesses,
+  solution,
+  solutionIndex,
+  tomorrow,
   showAlert,
 }) => {
   const handleShare = () => {
-    shareStatus(guesses, isGameLost, isHardMode);
+    shareStatus(guesses, solution, solutionIndex, isGameLost, isHardMode);
     showAlert('Game copied to clipboard', 'success');
   };
 
   return (
-    <Modal title="Statistics" isOpen={isOpen} onClose={onClose}>
+    <Modal
+      title={isUnlimited ? 'Practice Statistics' : 'Statistics'}
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <div className={styles.statsBar}>
         <StatItem label="Played" value={gameStats.totalGames} />
         <StatItem label="Win Rate %" value={gameStats.successRate} />
@@ -42,17 +51,25 @@ const StatsModal = ({
       </div>
       {(isGameWon || isGameLost) && (
         <div className={styles.result}>
-          <div className={styles.countDown}>
-            <h2>Next word in</h2>
-            <CountDown
-              date={tomorrow}
-              daysInHours={true}
-              className={styles.time}
-            />
-          </div>
-          <div className={styles.share}>
-            <button onClick={handleShare}>Share</button>
-          </div>
+          {isUnlimited ? (
+            <div className={styles.share}>
+              <button onClick={onNewGame}>New Game</button>
+            </div>
+          ) : (
+            <>
+              <div className={styles.countDown}>
+                <h2>Next word in</h2>
+                <CountDown
+                  date={tomorrow}
+                  daysInHours={true}
+                  className={styles.time}
+                />
+              </div>
+              <div className={styles.share}>
+                <button onClick={handleShare}>Share</button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </Modal>
