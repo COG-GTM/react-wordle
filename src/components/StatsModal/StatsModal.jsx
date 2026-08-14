@@ -12,11 +12,14 @@ const StatsModal = ({
   isGameWon,
   isGameLost,
   isHardMode,
+  isUnlimitedMode,
   guesses,
+  solution,
   showAlert,
+  onNewWord,
 }) => {
   const handleShare = () => {
-    shareStatus(guesses, isGameLost, isHardMode);
+    shareStatus(guesses, isGameLost, isHardMode, solution, isUnlimitedMode);
     showAlert('Game copied to clipboard', 'success');
   };
 
@@ -42,14 +45,20 @@ const StatsModal = ({
       </div>
       {(isGameWon || isGameLost) && (
         <div className={styles.result}>
-          <div className={styles.countDown}>
-            <h2>Next word in</h2>
-            <CountDown
-              date={tomorrow}
-              daysInHours={true}
-              className={styles.time}
-            />
-          </div>
+          {isUnlimitedMode ? (
+            <div className={styles.share}>
+              <button onClick={onNewWord}>New Word</button>
+            </div>
+          ) : (
+            <div className={styles.countDown}>
+              <h2>Next word in</h2>
+              <CountDown
+                date={tomorrow}
+                daysInHours={true}
+                className={styles.time}
+              />
+            </div>
+          )}
           <div className={styles.share}>
             <button onClick={handleShare}>Share</button>
           </div>
