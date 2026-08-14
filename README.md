@@ -4,6 +4,11 @@ Wordle game clone created using React, SASS
 
 ![Wordle Game Clone Screen Capture](public/Screenshot.png)
 
+### Game Modes
+
+- **Daily** (default): one word per day, shared by all players. Wins and losses update your streaks and guess distribution, and share output includes the day number.
+- **Unlimited**: practice with random words as often as you like. Toggle it on in Settings ("Unlimited Mode"). Practice games track their own separate stats and never touch your daily streaks, distribution, or in-progress daily board — switching back to Daily restores your daily game exactly. After finishing an Unlimited game, use the "New Game" button to start another random word. Share output for Unlimited games omits the day number.
+
 ### To Run Locally:
 
 In the project directory, you can run:
