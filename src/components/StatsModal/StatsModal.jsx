@@ -12,16 +12,23 @@ const StatsModal = ({
   isGameWon,
   isGameLost,
   isHardMode,
+  isUnlimitedMode,
   guesses,
+  solution,
   showAlert,
+  onNewGame,
 }) => {
   const handleShare = () => {
-    shareStatus(guesses, isGameLost, isHardMode);
+    shareStatus(guesses, isGameLost, isHardMode, solution, isUnlimitedMode);
     showAlert('Game copied to clipboard', 'success');
   };
 
   return (
-    <Modal title="Statistics" isOpen={isOpen} onClose={onClose}>
+    <Modal
+      title={isUnlimitedMode ? 'Statistics (Practice)' : 'Statistics'}
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <div className={styles.statsBar}>
         <StatItem label="Played" value={gameStats.totalGames} />
         <StatItem label="Win Rate %" value={gameStats.successRate} />
@@ -42,14 +49,20 @@ const StatsModal = ({
       </div>
       {(isGameWon || isGameLost) && (
         <div className={styles.result}>
-          <div className={styles.countDown}>
-            <h2>Next word in</h2>
-            <CountDown
-              date={tomorrow}
-              daysInHours={true}
-              className={styles.time}
-            />
-          </div>
+          {isUnlimitedMode ? (
+            <div className={styles.newGame}>
+              <button onClick={onNewGame}>New Game</button>
+            </div>
+          ) : (
+            <div className={styles.countDown}>
+              <h2>Next word in</h2>
+              <CountDown
+                date={tomorrow}
+                daysInHours={true}
+                className={styles.time}
+              />
+            </div>
+          )}
           <div className={styles.share}>
             <button onClick={handleShare}>Share</button>
           </div>
