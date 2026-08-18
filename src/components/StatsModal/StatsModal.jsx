@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
-import { shareStatus, tomorrow } from 'lib/words';
+import { shareStatus } from 'lib/words';
 
 const StatsModal = ({
   isOpen,
@@ -14,9 +14,12 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  solution,
+  solutionIndex,
+  tomorrow,
 }) => {
   const handleShare = () => {
-    shareStatus(guesses, isGameLost, isHardMode);
+    shareStatus(guesses, isGameLost, isHardMode, solution, solutionIndex);
     showAlert('Game copied to clipboard', 'success');
   };
 
