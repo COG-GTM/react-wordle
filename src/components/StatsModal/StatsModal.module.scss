@@ -77,6 +77,14 @@ h2 {
     }
   }
 
+  .newGame {
+    flex: 1;
+
+    button {
+      background: #6aaa64;
+    }
+  }
+
   .share {
     flex: 1;
     margin-left: 1rem;

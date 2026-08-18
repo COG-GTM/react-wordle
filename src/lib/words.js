@@ -9,9 +9,9 @@ export const isWordValid = word => {
   );
 };
 
-export const getGuessStatuses = guess => {
+export const getGuessStatuses = (guess, solution) => {
   const splitGuess = guess.toLowerCase().split('');
-  const splitSolution = solution.split('');
+  const splitSolution = solution.toLowerCase().split('');
 
   const statuses = [];
   const solutionCharsTaken = splitSolution.map(_ => false);
@@ -52,7 +52,7 @@ export const getGuessStatuses = guess => {
   return statuses;
 };
 
-export const getStatuses = guesses => {
+export const getStatuses = (guesses, solution) => {
   const charObj = {};
   const splitSolution = solution.toUpperCase().split('');
 
@@ -70,14 +70,14 @@ export const getStatuses = guesses => {
 // build a set of previously revealed letters - present and correct
 // guess must use correct letters in that space and any other revealed letters
 // also check if all revealed instances of a letter are used (i.e. two C's)
-export const findFirstUnusedReveal = (word, guesses) => {
+export const findFirstUnusedReveal = (word, guesses, solution) => {
   if (guesses.length === 0) {
     return false;
   }
 
   const lettersLeftArray = [];
   const guess = guesses[guesses.length - 1];
-  const statuses = getGuessStatuses(guess);
+  const statuses = getGuessStatuses(guess, solution);
   const splitWord = word.toUpperCase().split('');
   const splitGuess = guess.toUpperCase().split('');
 
@@ -107,7 +107,10 @@ export const findFirstUnusedReveal = (word, guesses) => {
 
 export const addStatsForCompletedGame = (gameStats, count) => {
   // Count is number of incorrect guesses before end.
-  const stats = { ...gameStats };
+  const stats = {
+    ...gameStats,
+    winDistribution: [...gameStats.winDistribution],
+  };
 
   stats.totalGames += 1;
 
@@ -137,21 +140,31 @@ const getSuccessRate = gameStats => {
   );
 };
 
-export const shareStatus = (guesses, isGameLost, isHardMode) => {
+export const shareStatus = (
+  guesses,
+  isGameLost,
+  isHardMode,
+  solution,
+  gameSolutionIndex
+) => {
+  const gameLabel =
+    gameSolutionIndex === null || gameSolutionIndex === undefined
+      ? 'Unlimited'
+      : `#${gameSolutionIndex}`;
   const textToShare =
     `Wordle Game
-#${solutionIndex} 
+${gameLabel} 
 ${isGameLost ? 'X' : guesses.length}/${MAX_CHALLENGES} 
 ${isHardMode ? 'Hard Mode' : ''}
-\n` + generateEmojiGrid(guesses);
+\n` + generateEmojiGrid(guesses, solution);
 
   navigator.clipboard.writeText(textToShare);
 };
 
-export const generateEmojiGrid = guesses => {
+export const generateEmojiGrid = (guesses, solution) => {
   return guesses
     .map(guess => {
-      const status = getGuessStatuses(guess);
+      const status = getGuessStatuses(guess, solution);
       const splitGuess = guess.split('');
 
       return splitGuess
@@ -182,6 +195,19 @@ export const getWordOfDay = () => {
     solution: WORDS[index % WORDS.length],
     solutionIndex: index,
     tomorrow: nextday,
+  };
+};
+
+export const getRandomWord = currentSolution => {
+  let solution;
+
+  do {
+    solution = WORDS[Math.floor(Math.random() * WORDS.length)];
+  } while (WORDS.length > 1 && solution === currentSolution);
+
+  return {
+    solution,
+    solutionIndex: null,
   };
 };
 
