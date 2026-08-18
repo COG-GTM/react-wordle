@@ -58,10 +58,10 @@ max guesses, `startsAt`), `guess_result` (own statuses), `opponent_progress`
 `opponent_reconnecting`, `opponent_reconnected`, `opponent_disconnected`, `room_expired`,
 `error` (`{ code, message }`).
 
-Error codes: `invalid_message`, `unknown_message_type`, `rate_limited`, `room_not_found`,
-`room_full`, `room_expired`, `relay_at_capacity`, `relay_draining`, `already_in_room`,
-`not_in_room`, `invalid_session`, `match_not_in_progress`, `invalid_guess`,
-`guess_budget_exhausted`.
+Error codes: `INVALID_MESSAGE`, `UNKNOWN_MESSAGE_TYPE`, `RATE_LIMITED`, `ROOM_NOT_FOUND`,
+`ROOM_FULL`, `ROOM_EXPIRED`, `RELAY_AT_CAPACITY`, `RELAY_DRAINING`, `ALREADY_IN_ROOM`,
+`NOT_IN_ROOM`, `INVALID_SESSION`, `MATCH_NOT_IN_PROGRESS`, `INVALID_GUESS`,
+`GUESS_BUDGET_EXHAUSTED`.
 
 ## Room lifecycle
 
