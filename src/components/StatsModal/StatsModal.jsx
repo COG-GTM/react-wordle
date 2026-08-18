@@ -44,7 +44,7 @@ const StatsModal = ({
             key={i}
             index={i}
             currentDayStatRow={numberOfGuessesMade === i + 1}
-            size={90 * (value / Math.max(...gameStats.winDistribution))}
+            size={90 * (value / Math.max(...gameStats.winDistribution, 1))}
             label={String(value)}
           />
         ))}

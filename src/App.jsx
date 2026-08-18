@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from 'components/Header';
 import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
@@ -21,7 +21,7 @@ import {
   MAX_CHALLENGES,
   MAX_WORD_LENGTH,
 } from 'constants/settings';
-import { EMPTY_STATS } from 'constants/stats';
+import { createEmptyStats } from 'constants/stats';
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
@@ -44,13 +44,14 @@ function App() {
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
-  const [stats, setStats] = useLocalStorage('gameStats', EMPTY_STATS);
+  const [stats, setStats] = useLocalStorage('gameStats', createEmptyStats());
   const [practiceStats, setPracticeStats] = useLocalStorage(
     'practiceStats',
-    EMPTY_STATS
+    createEmptyStats()
   );
   const isUnlimitedMode = gameMode === 'unlimited';
   const [unlimitedSolution, setUnlimitedSolution] = useState(() => {
+    if (!isUnlimitedMode) return unlimitedState.solution;
     return unlimitedState.solution || getRandomWord().solution;
   });
   const solution = isUnlimitedMode ? unlimitedSolution : dailySolution;
@@ -72,10 +73,11 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
+  const skipEndCheckRef = useRef(false);
 
   // Show welcome modal
   useEffect(() => {
-    if (!boardState.solutionIndex)
+    if (!boardState.solutionIndex && !unlimitedState.solution)
       setTimeout(() => setIsInfoModalOpen(true), 1000);
     // eslint-disable-next-line
   }, []);
@@ -94,10 +96,14 @@ function App() {
       });
     }
     // eslint-disable-next-line
-  }, [guesses, unlimitedSolution]);
+  }, [guesses, unlimitedSolution, gameMode]);
 
   // Check game winning or losing
   useEffect(() => {
+    if (skipEndCheckRef.current) {
+      skipEndCheckRef.current = false;
+      return;
+    }
     if (guesses.includes(solution.toUpperCase())) {
       setIsGameWon(true);
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
@@ -123,6 +129,7 @@ function App() {
   }, [isDarkMode, isHighContrastMode]);
 
   const loadBoardForMode = (mode, nextUnlimitedState) => {
+    skipEndCheckRef.current = true;
     let nextGuesses = [];
     let nextSolution = dailySolution;
 
@@ -152,7 +159,7 @@ function App() {
   };
 
   const handleNewGame = () => {
-    const { solution: newSolution } = getRandomWord();
+    const { solution: newSolution } = getRandomWord(unlimitedSolution);
     const nextUnlimitedState = { guesses: [], solution: newSolution };
     setUnlimitedState(nextUnlimitedState);
     setIsStatsModalOpen(false);

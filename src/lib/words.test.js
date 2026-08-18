@@ -16,6 +16,13 @@ describe('getRandomWord', () => {
     }
   });
 
+  it('never repeats the current solution', () => {
+    const current = WORDS[0];
+    for (let i = 0; i < 50; i++) {
+      expect(getRandomWord(current).solution).not.toBe(current);
+    }
+  });
+
   it('returns different words over many draws', () => {
     const draws = new Set(
       Array.from({ length: 100 }, () => getRandomWord().solution)

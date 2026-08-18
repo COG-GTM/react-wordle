@@ -107,7 +107,10 @@ export const findFirstUnusedReveal = (word, guesses, solution) => {
 
 export const addStatsForCompletedGame = (gameStats, count) => {
   // Count is number of incorrect guesses before end.
-  const stats = { ...gameStats };
+  const stats = {
+    ...gameStats,
+    winDistribution: [...gameStats.winDistribution],
+  };
 
   stats.totalGames += 1;
 
@@ -195,11 +198,15 @@ export const getWordOfDay = () => {
   };
 };
 
-export const getRandomWord = () => {
-  const index = Math.floor(Math.random() * WORDS.length);
+export const getRandomWord = currentSolution => {
+  let solution;
+
+  do {
+    solution = WORDS[Math.floor(Math.random() * WORDS.length)];
+  } while (WORDS.length > 1 && solution === currentSolution);
 
   return {
-    solution: WORDS[index],
+    solution,
     solutionIndex: null,
   };
 };
