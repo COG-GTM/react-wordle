@@ -93,10 +93,12 @@ describe('addStatsForCompletedGame', () => {
 
   it('does not mutate the stats object passed in', () => {
     const daily = initialStats();
-    const practice = addStatsForCompletedGame(initialStats(), 2);
+    const practice = addStatsForCompletedGame(daily, 2);
 
     expect(practice.totalGames).toBe(1);
+    expect(practice.winDistribution[2]).toBe(1);
     expect(daily.totalGames).toBe(0);
     expect(daily.currentStreak).toBe(0);
+    expect(daily.winDistribution[2]).toBe(0);
   });
 });

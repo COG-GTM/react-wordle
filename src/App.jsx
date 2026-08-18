@@ -24,14 +24,14 @@ import {
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
-const INITIAL_STATS = {
+const createInitialStats = () => ({
   winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
   gamesFailed: 0,
   currentStreak: 0,
   bestStreak: 0,
   totalGames: 0,
   successRate: 0,
-};
+});
 
 function App() {
   const [gameMode, setGameMode] = useLocalStorage('gameMode', 'daily');
@@ -52,10 +52,10 @@ function App() {
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
-  const [stats, setStats] = useLocalStorage('gameStats', INITIAL_STATS);
+  const [stats, setStats] = useLocalStorage('gameStats', createInitialStats());
   const [practiceStats, setPracticeStats] = useLocalStorage(
     'practiceStats',
-    INITIAL_STATS
+    createInitialStats()
   );
   const [unlimitedSolution, setUnlimitedSolution] = useState(
     () => unlimitedState.solution || getRandomWord()
@@ -84,7 +84,7 @@ function App() {
 
   // Show welcome modal
   useEffect(() => {
-    if (!boardState.solutionIndex)
+    if (!boardState.solutionIndex && !unlimitedState.solution)
       setTimeout(() => setIsInfoModalOpen(true), 1000);
     // eslint-disable-next-line
   }, []);
@@ -103,10 +103,12 @@ function App() {
       });
     }
     // eslint-disable-next-line
-  }, [guesses, unlimitedSolution]);
+  }, [guesses, unlimitedSolution, isUnlimitedMode]);
 
   // Check game winning or losing
   useEffect(() => {
+    if (isGameWon || isGameLost) return;
+
     if (guesses.includes(solution.toUpperCase())) {
       setIsGameWon(true);
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);

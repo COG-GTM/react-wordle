@@ -11,7 +11,7 @@ export const isWordValid = word => {
 
 export const getGuessStatuses = (guess, solution) => {
   const splitGuess = guess.toLowerCase().split('');
-  const splitSolution = solution.split('');
+  const splitSolution = solution.toLowerCase().split('');
 
   const statuses = [];
   const solutionCharsTaken = splitSolution.map(_ => false);
@@ -107,7 +107,10 @@ export const findFirstUnusedReveal = (word, guesses, solution) => {
 
 export const addStatsForCompletedGame = (gameStats, count) => {
   // Count is number of incorrect guesses before end.
-  const stats = { ...gameStats };
+  const stats = {
+    ...gameStats,
+    winDistribution: [...gameStats.winDistribution],
+  };
 
   stats.totalGames += 1;
 
@@ -145,7 +148,7 @@ export const shareStatus = (
   solutionIndex
 ) => {
   const heading =
-    solutionIndex === null
+    solutionIndex == null
       ? 'Wordle Game (Unlimited)'
       : `Wordle Game\n#${solutionIndex} `;
   const textToShare =
