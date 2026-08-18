@@ -5,7 +5,13 @@ import { getGuessStatuses } from 'lib/words';
 import { MAX_CHALLENGES, MAX_WORD_LENGTH } from 'constants/settings';
 import styles from './Grid.module.scss';
 
-const Grid = ({ currentGuess, guesses, isJiggling, setIsJiggling }) => {
+const Grid = ({
+  currentGuess,
+  guesses,
+  solution,
+  isJiggling,
+  setIsJiggling,
+}) => {
   const empties =
     MAX_CHALLENGES > guesses.length
       ? Array(MAX_CHALLENGES - guesses.length - 1).fill()
@@ -21,7 +27,7 @@ const Grid = ({ currentGuess, guesses, isJiggling, setIsJiggling }) => {
   return (
     <div className={styles.grid}>
       {guesses.map((guess, i) => (
-        <CompletedRow key={i} guess={guess} />
+        <CompletedRow key={i} guess={guess} solution={solution} />
       ))}
       {guesses.length < MAX_CHALLENGES && (
         <CurrentRow guess={currentGuess} isJiggling={isJiggling} />
@@ -51,9 +57,9 @@ const CurrentRow = ({ guess, isJiggling }) => {
   );
 };
 
-const CompletedRow = ({ guess }) => {
+const CompletedRow = ({ guess, solution }) => {
   const cells = guess.split('');
-  const statuses = getGuessStatuses(guess);
+  const statuses = getGuessStatuses(guess, solution);
 
   return (
     <div className={styles.row}>
