@@ -9,8 +9,7 @@ import StatsModal from 'components/StatsModal';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useAlert from 'hooks/useAlert';
 import {
-  solution,
-  solutionIndex,
+  getWordOfDay,
   isWordValid,
   findFirstUnusedReveal,
   addStatsForCompletedGame,
@@ -24,6 +23,7 @@ import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
 function App() {
+  const [{ solution, solutionIndex, tomorrow }] = useState(getWordOfDay);
   const [boardState, setBoardState] = useLocalStorage('boardState', {
     guesses: [],
     solutionIndex: '',
@@ -137,7 +137,11 @@ function App() {
     }
 
     if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
+      const firstMissingReveal = findFirstUnusedReveal(
+        currentGuess,
+        guesses,
+        solution
+      );
       if (firstMissingReveal) {
         setIsJiggling(true);
         return showAlert(firstMissingReveal, 'error');
@@ -167,12 +171,14 @@ function App() {
         guesses={guesses}
         isJiggling={isJiggling}
         setIsJiggling={setIsJiggling}
+        solution={solution}
       />
       <Keyboard
         onEnter={handleEnter}
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
         guesses={guesses}
+        solution={solution}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -198,6 +204,9 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        solution={solution}
+        solutionIndex={solutionIndex}
+        tomorrow={tomorrow}
       />
     </div>
   );
