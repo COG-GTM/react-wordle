@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
-import { shareStatus, tomorrow } from 'lib/words';
+import { shareStatus } from 'lib/words';
 
 const StatsModal = ({
   isOpen,
@@ -12,11 +12,16 @@ const StatsModal = ({
   isGameWon,
   isGameLost,
   isHardMode,
+  isUnlimitedMode,
   guesses,
+  solution,
+  solutionIndex,
+  tomorrow,
+  onNewGame,
   showAlert,
 }) => {
   const handleShare = () => {
-    shareStatus(guesses, isGameLost, isHardMode);
+    shareStatus(guesses, isGameLost, isHardMode, solution, solutionIndex);
     showAlert('Game copied to clipboard', 'success');
   };
 
@@ -42,14 +47,20 @@ const StatsModal = ({
       </div>
       {(isGameWon || isGameLost) && (
         <div className={styles.result}>
-          <div className={styles.countDown}>
-            <h2>Next word in</h2>
-            <CountDown
-              date={tomorrow}
-              daysInHours={true}
-              className={styles.time}
-            />
-          </div>
+          {isUnlimitedMode ? (
+            <div className={styles.newGame}>
+              <button onClick={onNewGame}>New Game</button>
+            </div>
+          ) : (
+            <div className={styles.countDown}>
+              <h2>Next word in</h2>
+              <CountDown
+                date={tomorrow}
+                daysInHours={true}
+                className={styles.time}
+              />
+            </div>
+          )}
           <div className={styles.share}>
             <button onClick={handleShare}>Share</button>
           </div>

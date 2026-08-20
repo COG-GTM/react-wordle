@@ -61,3 +61,29 @@ body {
   flex-direction: column;
   justify-content: space-between;
 }
+
+.modeToggle {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .modeToggleLabel {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .modeToggle {
+    bottom: 0.5rem;
+    right: 0.5rem;
+
+    .modeToggleLabel {
+      font-size: 0.9rem;
+    }
+  }
+}
