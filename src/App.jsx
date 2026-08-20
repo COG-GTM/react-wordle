@@ -11,10 +11,12 @@ import useAlert from 'hooks/useAlert';
 import {
   solution,
   solutionIndex,
+  getRandomWord,
   isWordValid,
   findFirstUnusedReveal,
   addStatsForCompletedGame,
 } from 'lib/words';
+import { WORDS } from 'constants/wordList';
 import {
   ALERT_DELAY,
   MAX_CHALLENGES,
@@ -23,27 +25,53 @@ import {
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
+const emptyStats = () => ({
+  winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
+  gamesFailed: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+  totalGames: 0,
+  successRate: 0,
+});
+
 function App() {
+  const [gameMode, setGameMode] = useLocalStorage('gameMode', 'daily');
   const [boardState, setBoardState] = useLocalStorage('boardState', {
     guesses: [],
     solutionIndex: '',
   });
+  const [unlimitedState, setUnlimitedState] = useLocalStorage(
+    'unlimitedState',
+    {
+      guesses: [],
+      solutionIndex: null,
+    }
+  );
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
-  const [stats, setStats] = useLocalStorage('gameStats', {
-    winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
-    gamesFailed: 0,
-    currentStreak: 0,
-    bestStreak: 0,
-    totalGames: 0,
-    successRate: 0,
-  });
+  const [stats, setStats] = useLocalStorage('gameStats', emptyStats());
+  const [practiceStats, setPracticeStats] = useLocalStorage(
+    'practiceStats',
+    emptyStats()
+  );
+
+  const isUnlimitedMode = gameMode === 'unlimited';
+  const activeSolution = isUnlimitedMode
+    ? WORDS[unlimitedState.solutionIndex ?? 0]
+    : solution;
+  const activeStats = isUnlimitedMode ? practiceStats : stats;
+  const setActiveStats = isUnlimitedMode ? setPracticeStats : setStats;
+
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState(() => {
+    if (gameMode === 'unlimited') {
+      if (unlimitedState.solutionIndex === null) return [];
+      return unlimitedState.guesses;
+    }
     if (boardState.solutionIndex !== solutionIndex) return [];
     return boardState.guesses;
   });
@@ -65,25 +93,45 @@ function App() {
     // eslint-disable-next-line
   }, []);
 
-  // Save boardState to localStorage
+  // Pick an unlimited word if none exists yet
   useEffect(() => {
-    setBoardState({
-      guesses,
-      solutionIndex,
-    });
+    if (isUnlimitedMode && unlimitedState.solutionIndex === null) {
+      setUnlimitedState({
+        guesses: [],
+        solutionIndex: getRandomWord().solutionIndex,
+      });
+    }
+    // eslint-disable-next-line
+  }, [isUnlimitedMode]);
+
+  // Save board state per mode to localStorage
+  useEffect(() => {
+    if (isUnlimitedMode) {
+      if (unlimitedState.solutionIndex === null) return;
+      setUnlimitedState({
+        guesses,
+        solutionIndex: unlimitedState.solutionIndex,
+      });
+    } else {
+      setBoardState({
+        guesses,
+        solutionIndex,
+      });
+    }
     // eslint-disable-next-line
   }, [guesses]);
 
   // Check game winning or losing
   useEffect(() => {
-    if (guesses.includes(solution.toUpperCase())) {
+    if (isGameWon || isGameLost) return;
+    if (guesses.includes(activeSolution.toUpperCase())) {
       setIsGameWon(true);
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
     } else if (guesses.length === MAX_CHALLENGES) {
       setIsGameLost(true);
       setTimeout(
-        () => showAlert(`The word was ${solution}`, 'error', true),
+        () => showAlert(`The word was ${activeSolution}`, 'error', true),
         ALERT_DELAY
       );
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
@@ -99,6 +147,43 @@ function App() {
       document.body.setAttribute('data-mode', 'high-contrast');
     else document.body.removeAttribute('data-mode');
   }, [isDarkMode, isHighContrastMode]);
+
+  const loadGuesses = (mode, unlimitedSolutionIndex) => {
+    if (mode === 'unlimited') {
+      return unlimitedSolutionIndex === null ? [] : unlimitedState.guesses;
+    }
+    return boardState.solutionIndex === solutionIndex ? boardState.guesses : [];
+  };
+
+  const applyGuesses = (nextGuesses, nextSolution) => {
+    setCurrentGuess('');
+    setIsGameWon(nextGuesses.includes(nextSolution.toUpperCase()));
+    setIsGameLost(
+      !nextGuesses.includes(nextSolution.toUpperCase()) &&
+        nextGuesses.length === MAX_CHALLENGES
+    );
+    setGuesses(nextGuesses);
+  };
+
+  const handleGameMode = () => {
+    const nextMode = isUnlimitedMode ? 'daily' : 'unlimited';
+    setGameMode(nextMode);
+
+    if (nextMode === 'unlimited') {
+      const nextGuesses = loadGuesses(nextMode, unlimitedState.solutionIndex);
+      const nextSolution = WORDS[unlimitedState.solutionIndex ?? 0];
+      applyGuesses(nextGuesses, nextSolution);
+    } else {
+      applyGuesses(loadGuesses(nextMode), solution);
+    }
+  };
+
+  const handleNewGame = () => {
+    const { solutionIndex: nextIndex } = getRandomWord();
+    setUnlimitedState({ guesses: [], solutionIndex: nextIndex });
+    setIsStatsModalOpen(false);
+    applyGuesses([], WORDS[nextIndex]);
+  };
 
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -137,17 +222,21 @@ function App() {
     }
 
     if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
+      const firstMissingReveal = findFirstUnusedReveal(
+        currentGuess,
+        guesses,
+        activeSolution
+      );
       if (firstMissingReveal) {
         setIsJiggling(true);
         return showAlert(firstMissingReveal, 'error');
       }
     }
 
-    if (currentGuess === solution.toUpperCase()) {
-      setStats(addStatsForCompletedGame(stats, guesses.length));
+    if (currentGuess === activeSolution.toUpperCase()) {
+      setActiveStats(addStatsForCompletedGame(activeStats, guesses.length));
     } else if (guesses.length + 1 === MAX_CHALLENGES) {
-      setStats(addStatsForCompletedGame(stats, guesses.length + 1));
+      setActiveStats(addStatsForCompletedGame(activeStats, guesses.length + 1));
     }
 
     setGuesses([...guesses, currentGuess]);
@@ -157,6 +246,7 @@ function App() {
   return (
     <div className={styles.container}>
       <Header
+        isUnlimitedMode={isUnlimitedMode}
         setIsInfoModalOpen={setIsInfoModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
@@ -165,6 +255,7 @@ function App() {
       <Grid
         currentGuess={currentGuess}
         guesses={guesses}
+        solution={activeSolution}
         isJiggling={isJiggling}
         setIsJiggling={setIsJiggling}
       />
@@ -173,6 +264,7 @@ function App() {
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
         guesses={guesses}
+        solution={activeSolution}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -181,9 +273,11 @@ function App() {
       <SettingModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
+        isUnlimitedMode={isUnlimitedMode}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
+        setIsUnlimitedMode={handleGameMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
@@ -191,12 +285,15 @@ function App() {
       <StatsModal
         isOpen={isStatsModalOpen}
         onClose={() => setIsStatsModalOpen(false)}
-        gameStats={stats}
+        gameStats={activeStats}
         numberOfGuessesMade={guesses.length}
         isGameWon={isGameWon}
         isGameLost={isGameLost}
         isHardMode={isHardMode}
+        isUnlimitedMode={isUnlimitedMode}
         guesses={guesses}
+        solution={activeSolution}
+        onNewGame={handleNewGame}
         showAlert={showAlert}
       />
     </div>
