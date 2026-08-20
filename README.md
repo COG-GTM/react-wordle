@@ -9,8 +9,9 @@ Wordle game clone created using React, SASS
 - **Daily** (default): one word per day, shared by everyone. Wins and losses
   update your streaks and guess distribution, and the share text includes the
   day number.
-- **Unlimited**: practice with random words, back to back. Toggle it on from
-  the Settings modal (gear icon). Unlimited games track a separate practice
+- **Unlimited**: practice with random words, back to back. Toggle it on with
+  the switch in the bottom-right corner of the main page. Unlimited games
+  track a separate practice
   stats bucket and never touch your daily stats or streaks; the share text
   shows "Unlimited" instead of a day number, and a "New Game" button lets you
   start a fresh random word after each game. Your in-progress daily board is

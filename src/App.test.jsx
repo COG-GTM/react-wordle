@@ -17,12 +17,12 @@ test('renders the game in daily mode by default', () => {
   renderApp();
   expect(screen.getByText('WORDLE')).toBeInTheDocument();
   expect(screen.queryByText('Unlimited')).not.toBeInTheDocument();
+  expect(screen.getByText('Unlimited Mode')).toBeInTheDocument();
 });
 
 test('shows the Unlimited indicator and persists mode after toggling', () => {
   renderApp();
-  fireEvent.click(screen.getAllByRole('button')[2]); // settings
-  fireEvent.click(screen.getAllByRole('checkbox')[0]); // unlimited toggle
+  fireEvent.click(screen.getByRole('checkbox')); // unlimited toggle (bottom right)
   expect(screen.getByText('Unlimited')).toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem('gameMode'))).toBe('unlimited');
 });
@@ -37,8 +37,7 @@ test('keeps daily board state isolated when switching modes', () => {
   // 'C' appears on both the keyboard and the restored guess row
   expect(screen.getAllByText('C').length).toBeGreaterThan(1);
 
-  fireEvent.click(screen.getAllByRole('button')[2]); // settings
-  fireEvent.click(screen.getAllByRole('checkbox')[0]); // back to daily
+  fireEvent.click(screen.getByRole('checkbox')); // back to daily
   expect(screen.queryByText('Unlimited')).not.toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem('unlimitedState')).guesses).toEqual([
     'CRANE',
