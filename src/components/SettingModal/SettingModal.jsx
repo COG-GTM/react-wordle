@@ -5,15 +5,23 @@ import styles from './SettingModal.module.scss';
 const SettingModal = ({
   isOpen,
   onClose,
+  isUnlimitedMode,
   isHardMode,
   isDarkMode,
   isHighContrastMode,
+  setIsUnlimitedMode,
   setIsHardMode,
   setIsDarkMode,
   setIsHighContrastMode,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
+      <Row
+        title="Unlimited Mode"
+        desc="Practice with random words without affecting your daily stats"
+        isOn={isUnlimitedMode}
+        onToggle={setIsUnlimitedMode}
+      />
       <Row
         title="Hard Mode"
         desc="Any revealed hints must be used in subsequent guesses"

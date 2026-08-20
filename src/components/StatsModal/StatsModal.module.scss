@@ -82,6 +82,12 @@ h2 {
     margin-left: 1rem;
   }
 
+  .newGame {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
   button {
     background: #a01ef7;
     width: 100%;
