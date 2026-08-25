@@ -36,7 +36,7 @@ export const getGuessStatuses = guess => {
 
     // now we are left with "present"s
     const indexOfPresentChar = splitSolution.findIndex(
-      (x, index) => x === letter && !solutionCharsTaken[index]
+      (x, index) => x === letter && !solutionCharsTaken[index],
     );
 
     if (indexOfPresentChar > -1) {
@@ -133,7 +133,7 @@ const getSuccessRate = gameStats => {
   const { totalGames, gamesFailed } = gameStats;
 
   return Math.round(
-    (100 * (totalGames - gamesFailed)) / Math.max(totalGames, 1)
+    (100 * (totalGames - gamesFailed)) / Math.max(totalGames, 1),
   );
 };
 
