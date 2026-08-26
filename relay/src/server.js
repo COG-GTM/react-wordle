@@ -267,8 +267,10 @@ function createRelayServer(
     } else {
       if (joinLimiters.size >= MAX_JOIN_LIMITERS) {
         pruneJoinLimiters(joinLimiters);
-        const oldestIp = joinLimiters.keys().next().value;
-        joinLimiters.delete(oldestIp);
+        if (joinLimiters.size >= MAX_JOIN_LIMITERS) {
+          const oldestIp = joinLimiters.keys().next().value;
+          joinLimiters.delete(oldestIp);
+        }
       }
       limiter = createRateLimiter({
         limit: config.joinRateLimit,
