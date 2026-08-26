@@ -2,6 +2,7 @@ import { BsBarChart, BsGear, BsInfoCircle } from 'react-icons/bs';
 import './Header.module.scss';
 
 const Header = ({
+  isUnlimitedMode,
   setIsInfoModalOpen,
   setIsStatsModalOpen,
   setIsSettingsModalOpen,
@@ -13,7 +14,10 @@ const Header = ({
           <BsInfoCircle size="1.6rem" color="var(--color-icon)" />
         </button>
       </div>
-      <h1>WORDLE</h1>
+      <div className="heading">
+        <h1>WORDLE</h1>
+        {isUnlimitedMode && <span className="modeLabel">Unlimited</span>}
+      </div>
       <div>
         <button onClick={() => setIsStatsModalOpen(true)}>
           <BsBarChart size="1.6rem" color="var(--color-icon)" />
