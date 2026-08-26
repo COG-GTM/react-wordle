@@ -188,6 +188,29 @@ test('prunes idle join limiters regardless of token balance', () => {
   assert.equal(limiters.size, 0);
 });
 
+test('rate-limits repeated malformed frames', async () => {
+  const relay = createRelayServer(
+    config({
+      MSG_RATE_LIMIT: 1,
+      MSG_RATE_WINDOW_MS: 60000,
+    })
+  );
+  const port = await startServer(relay);
+  const ws = connect(port);
+  await waitOpen(ws);
+
+  const malformed = nextMessage(ws);
+  ws.send('{');
+  assert.equal((await malformed).payload.code, 'MALFORMED_MESSAGE');
+
+  const rateLimited = nextMessage(ws);
+  ws.send('{');
+  assert.equal((await rateLimited).payload.code, 'RATE_LIMITED');
+
+  await closeSocket(ws);
+  await relay.close();
+});
+
 test('enforces configured origins even in insecure mode', async () => {
   const relay = createRelayServer(
     config({

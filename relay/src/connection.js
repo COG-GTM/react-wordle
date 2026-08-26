@@ -129,6 +129,12 @@ function attachConnection(
   };
 
   ws.on('message', async (data, isBinary) => {
+    if (!session.limiter.consume()) {
+      session.strikes += 1;
+      await fail(ERROR_CODES.RATE_LIMITED);
+      if (session.strikes >= 3) ws.close(CLOSE_CODES.RATE_LIMITED);
+      return;
+    }
     if (isBinary) {
       await fail(ERROR_CODES.MALFORMED_MESSAGE);
       return;
@@ -143,12 +149,6 @@ function attachConnection(
     const validation = validateInbound(parsed);
     if (!validation.ok) {
       await fail(validation.code);
-      return;
-    }
-    if (!session.limiter.consume()) {
-      session.strikes += 1;
-      await fail(ERROR_CODES.RATE_LIMITED);
-      if (session.strikes >= 3) ws.close(CLOSE_CODES.RATE_LIMITED);
       return;
     }
     try {
