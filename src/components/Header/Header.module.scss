@@ -10,17 +10,13 @@ h1 {
 }
 
 .badge {
-  display: inline-block;
-  vertical-align: middle;
-  margin-left: 0.5rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 5px;
+  display: block;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: #a01ef7;
-  color: #fff;
+  letter-spacing: 0.3em;
+  text-align: center;
+  color: var(--color-text-secondary);
 }
 
 button {
