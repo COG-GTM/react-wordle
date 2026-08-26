@@ -30,6 +30,22 @@ function nextMessage(ws) {
   });
 }
 
+function nextMessages(ws, count) {
+  return new Promise((resolve, reject) => {
+    const messages = [];
+    const onMessage = data => {
+      messages.push(JSON.parse(data.toString()));
+      if (messages.length === count) {
+        ws.off('message', onMessage);
+        ws.off('error', reject);
+        resolve(messages);
+      }
+    };
+    ws.on('message', onMessage);
+    ws.once('error', reject);
+  });
+}
+
 function connect(port, origin = 'http://localhost:3000') {
   return new WebSocket(`ws://127.0.0.1:${port}/ws`, { origin });
 }
@@ -147,6 +163,44 @@ test('creates, joins, rejects full and unknown rooms, and exposes health', async
   await relay.close();
 });
 
+test('serializes pipelined room creation requests', async () => {
+  const relay = createRelayServer(config());
+  const port = await startServer(relay);
+  const host = connect(port);
+  await waitOpen(host);
+
+  const messages = nextMessages(host, 2);
+  const create = JSON.stringify({ v: 1, type: 'create_room', payload: {} });
+  host.send(create);
+  host.send(create);
+  const received = await messages;
+  assert.equal(
+    received.filter(message => message.type === 'room_created').length,
+    1
+  );
+  assert.equal(
+    received.filter(
+      message =>
+        message.type === 'error' && message.payload.code === 'ALREADY_IN_ROOM'
+    ).length,
+    1
+  );
+
+  const stats = await new Promise((resolve, reject) => {
+    http
+      .get(`http://127.0.0.1:${port}/stats`, response => {
+        let body = '';
+        response.on('data', chunk => (body += chunk));
+        response.on('end', () => resolve(JSON.parse(body)));
+      })
+      .on('error', reject);
+  });
+  assert.equal(stats.rooms, 1);
+
+  await closeSocket(host);
+  await relay.close();
+});
+
 test('broadcasts one room sequence to every recipient', async () => {
   let now = 0;
   const store = new InMemoryRoomStore({
@@ -231,7 +285,7 @@ test('enforces configured origins even in insecure mode', async () => {
   const relay = createRelayServer(
     config({
       RELAY_ALLOW_INSECURE: 'true',
-      ALLOWED_ORIGINS: 'http://allowed.example',
+      ALLOWED_ORIGINS: 'https://allowed.example:443',
     })
   );
   const port = await startServer(relay);
@@ -245,7 +299,7 @@ test('enforces configured origins even in insecure mode', async () => {
         ws.once('error', reject);
       })
   );
-  const allowed = connect(port, 'http://allowed.example');
+  const allowed = connect(port, 'https://allowed.example');
   await waitOpen(allowed);
   await closeSocket(allowed);
   await relay.close();

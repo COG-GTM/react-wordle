@@ -34,11 +34,7 @@ function originAllowed(origin, allowedOrigins) {
     const candidate = new URL(origin);
     return allowedOrigins.some(value => {
       const allowed = new URL(value);
-      return (
-        candidate.protocol.toLowerCase() === allowed.protocol.toLowerCase() &&
-        candidate.hostname.toLowerCase() === allowed.hostname.toLowerCase() &&
-        candidate.port === allowed.port
-      );
+      return candidate.origin.toLowerCase() === allowed.origin.toLowerCase();
     });
   } catch {
     return false;

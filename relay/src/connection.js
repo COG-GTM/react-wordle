@@ -27,6 +27,7 @@ function attachConnection(
     }),
     strikes: 0,
     cleaned: false,
+    roomPending: false,
     missedPongs: 0,
   };
 
@@ -56,60 +57,77 @@ function attachConnection(
   };
 
   const createRoom = async () => {
-    if (session.roomCode) {
+    if (session.roomCode || session.roomPending) {
       await fail(ERROR_CODES.ALREADY_IN_ROOM);
       return;
     }
-    const room = await store.createRoom({ codeLength: config.roomCodeLength });
-    const player = room.players.find(candidate => candidate.role === 'host');
-    session.playerId = player.playerId;
-    session.playerToken = player.playerToken;
-    session.roomCode = room.code;
-    await store.touch(room.code);
-    log('room_created', session);
-    await send(MESSAGE_TYPES.ROOM_CREATED, room.code, {
-      code: room.code,
-      joinUrl: `${config.publicAppOrigin}/versus/${room.code}`,
-      playerId: player.playerId,
-      playerToken: player.playerToken,
-      role: player.role,
-      expiresAt: room.createdAt + config.unjoinedTtlMs,
-    });
+    session.roomPending = true;
+    try {
+      const room = await store.createRoom({
+        codeLength: config.roomCodeLength,
+      });
+      const player = room.players.find(candidate => candidate.role === 'host');
+      session.playerId = player.playerId;
+      session.playerToken = player.playerToken;
+      session.roomCode = room.code;
+      await store.touch(room.code);
+      log('room_created', session);
+      await send(MESSAGE_TYPES.ROOM_CREATED, room.code, {
+        code: room.code,
+        joinUrl: `${config.publicAppOrigin}/versus/${room.code}`,
+        playerId: player.playerId,
+        playerToken: player.playerToken,
+        role: player.role,
+        expiresAt: room.createdAt + config.unjoinedTtlMs,
+      });
+    } finally {
+      session.roomPending = false;
+    }
   };
 
   const joinRoom = async codeInput => {
-    if (session.roomCode) {
+    if (session.roomCode || session.roomPending) {
       await fail(ERROR_CODES.ALREADY_IN_ROOM);
       return;
     }
-    const code = normalizeCode(codeInput);
-    if (!code) {
-      await fail(ERROR_CODES.ROOM_NOT_FOUND);
-      return;
-    }
-    const result = await store.joinRoom(code);
-    const player = result.player;
-    session.playerId = player.playerId;
-    session.playerToken = player.playerToken;
-    session.roomCode = code;
-    await store.touch(code);
-    const host = result.room.players.find(
-      candidate => candidate.role === 'host'
-    );
-    await send(MESSAGE_TYPES.ROOM_JOINED, code, {
-      code,
-      playerId: player.playerId,
-      playerToken: player.playerToken,
-      role: player.role,
-      opponentPresent: Boolean(host),
-      expiresAt: result.room.joinedAt + config.idleTtlMs,
-    });
-    if (host) {
-      await onPeerMessage(code, host.playerId, MESSAGE_TYPES.OPPONENT_JOINED, {
+    session.roomPending = true;
+    try {
+      const code = normalizeCode(codeInput);
+      if (!code) {
+        await fail(ERROR_CODES.ROOM_NOT_FOUND);
+        return;
+      }
+      const result = await store.joinRoom(code);
+      const player = result.player;
+      session.playerId = player.playerId;
+      session.playerToken = player.playerToken;
+      session.roomCode = code;
+      await store.touch(code);
+      const host = result.room.players.find(
+        candidate => candidate.role === 'host'
+      );
+      await send(MESSAGE_TYPES.ROOM_JOINED, code, {
         code,
+        playerId: player.playerId,
+        playerToken: player.playerToken,
+        role: player.role,
+        opponentPresent: Boolean(host),
+        expiresAt: result.room.joinedAt + config.idleTtlMs,
       });
+      if (host) {
+        await onPeerMessage(
+          code,
+          host.playerId,
+          MESSAGE_TYPES.OPPONENT_JOINED,
+          {
+            code,
+          }
+        );
+      }
+      log('room_joined', session);
+    } finally {
+      session.roomPending = false;
     }
-    log('room_joined', session);
   };
 
   const leave = async () => {
@@ -117,8 +135,8 @@ function attachConnection(
       await fail(ERROR_CODES.NOT_IN_ROOM);
       return;
     }
-    await onDisconnect(session, true);
     session.cleaned = true;
+    await onDisconnect(session, true);
     ws.close(1000);
   };
 
