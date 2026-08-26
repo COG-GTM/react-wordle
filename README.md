@@ -27,3 +27,8 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
+
+### Versus relay
+
+The independently deployable WebSocket relay for versus rooms lives in
+[`relay/`](relay/). See its README for configuration, protocol, and operations.
