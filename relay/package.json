@@ -1,0 +1,21 @@
+{
+  "name": "wordle-relay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/",
+    "check": "prettier --check src test",
+    "fix": "prettier --write src test"
+  },
+  "dependencies": {
+    "ws": "8.21.3"
+  },
+  "devDependencies": {
+    "prettier": "2.6.1"
+  }
+}
