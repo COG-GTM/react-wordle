@@ -1,0 +1,104 @@
+const os = require('node:os');
+const crypto = require('node:crypto');
+
+function envValue(env, name, fallback) {
+  const value = env[name];
+  if (
+    value === undefined ||
+    value === null ||
+    (typeof value === 'string' && value.trim() === '')
+  ) {
+    return fallback;
+  }
+  return value;
+}
+
+function positiveInteger(env, name, fallback) {
+  const value = envValue(env, name, fallback);
+  const number = Number(value);
+  if (!Number.isSafeInteger(number) || number <= 0) {
+    throw new Error(`${name} must be a positive number`);
+  }
+  return number;
+}
+
+function booleanValue(env, name, fallback) {
+  const value = envValue(env, name, undefined);
+  if (value === undefined) return fallback;
+  if (value === 'true' || value === '1') return true;
+  if (value === 'false' || value === '0') return false;
+  throw new Error(`${name} must be true or false`);
+}
+
+function loadConfig(env = process.env) {
+  const allowInsecure = booleanValue(env, 'RELAY_ALLOW_INSECURE', false);
+  const allowedOrigins = envValue(env, 'ALLOWED_ORIGINS', '')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+  if (!allowInsecure && allowedOrigins.length === 0) {
+    throw new Error('ALLOWED_ORIGINS is required in secure mode');
+  }
+  for (const origin of allowedOrigins) {
+    try {
+      const parsed = new URL(origin);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error();
+    } catch {
+      throw new Error(`ALLOWED_ORIGINS contains an invalid origin: ${origin}`);
+    }
+  }
+
+  const tlsCertPath = envValue(env, 'TLS_CERT_PATH', null);
+  const tlsKeyPath = envValue(env, 'TLS_KEY_PATH', null);
+  if ((tlsCertPath && !tlsKeyPath) || (!tlsCertPath && tlsKeyPath)) {
+    throw new Error('TLS_CERT_PATH and TLS_KEY_PATH must be set together');
+  }
+
+  const roomCodeLength = positiveInteger(env, 'ROOM_CODE_LENGTH', 6);
+  if (
+    !Number.isInteger(roomCodeLength) ||
+    roomCodeLength < 4 ||
+    roomCodeLength > 6
+  ) {
+    throw new Error('ROOM_CODE_LENGTH must be an integer from 4 to 6');
+  }
+
+  const publicAppOrigin =
+    envValue(env, 'PUBLIC_APP_ORIGIN', null) ||
+    allowedOrigins[0] ||
+    (allowInsecure ? 'http://localhost:3000' : null);
+  try {
+    const parsed = new URL(publicAppOrigin);
+    if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error();
+  } catch {
+    throw new Error('PUBLIC_APP_ORIGIN must be an HTTP or HTTPS origin');
+  }
+
+  const config = {
+    port: positiveInteger(env, 'PORT', 8080),
+    host: envValue(env, 'HOST', '0.0.0.0'),
+    allowedOrigins: Object.freeze(allowedOrigins),
+    publicAppOrigin: publicAppOrigin.replace(/\/+$/, ''),
+    allowInsecure,
+    tlsCertPath,
+    tlsKeyPath,
+    trustProxyProto: booleanValue(env, 'TRUST_PROXY_PROTO', false),
+    roomCodeLength,
+    unjoinedTtlMs: positiveInteger(env, 'UNJOINED_TTL_MS', 600000),
+    idleTtlMs: positiveInteger(env, 'IDLE_TTL_MS', 1800000),
+    sweepIntervalMs: positiveInteger(env, 'SWEEP_INTERVAL_MS', 15000),
+    maxRooms: positiveInteger(env, 'MAX_ROOMS', 1000),
+    maxSockets: positiveInteger(env, 'MAX_SOCKETS', 2000),
+    maxMessageBytes: positiveInteger(env, 'MAX_MESSAGE_BYTES', 2048),
+    msgRateLimit: positiveInteger(env, 'MSG_RATE_LIMIT', 40),
+    msgRateWindowMs: positiveInteger(env, 'MSG_RATE_WINDOW_MS', 10000),
+    joinRateLimit: positiveInteger(env, 'JOIN_RATE_LIMIT', 10),
+    joinRateWindowMs: positiveInteger(env, 'JOIN_RATE_WINDOW_MS', 60000),
+    instanceId:
+      envValue(env, 'INSTANCE_ID', null) ||
+      `${os.hostname()}-${crypto.randomBytes(4).toString('hex')}`,
+  };
+  return Object.freeze(config);
+}
+
+module.exports = { loadConfig };

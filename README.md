@@ -27,3 +27,9 @@ It correctly bundles React in production mode and optimizes the build for the be
 
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
+
+### Versus relay
+
+The two-player Versus mode uses the independently deployable WebSocket relay
+in [`relay/`](relay/). See [`relay/README.md`](relay/README.md) for its
+configuration, local development commands, and message contract.
