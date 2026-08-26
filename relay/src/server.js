@@ -163,11 +163,13 @@ function createRelayServer(
             reason: CLOSE_REASONS.HOST_LEFT,
           }
         );
+        await store.deleteRoom(room.code);
         for (const other of sessions) {
           if (other.playerId === guest.playerId) other.ws.close(1000);
         }
+      } else {
+        await store.deleteRoom(room.code);
       }
-      await store.deleteRoom(room.code);
     } else {
       await store.removePlayer(room.code, session.playerId);
       const host = room.players.find(candidate => candidate.role === 'host');

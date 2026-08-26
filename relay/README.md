@@ -38,7 +38,8 @@ origins are still enforced.
 `GET /healthz` returns service health. `GET /stats` returns room/socket counts,
 instance ID, and uptime without room codes or personal data. WebSockets use
 `/ws` and must use WSS outside insecure development mode. Application-level
-`ping` messages count as room activity; protocol-level WebSocket pings do not.
+`ping` messages refresh idle activity, but neither kind extends the unjoined
+TTL, which is measured from room creation.
 In insecure mode without `PUBLIC_APP_ORIGIN` or an allowed origin, room links
 default to `http://localhost:3000`.
 Only set `TRUST_PROXY_PROTO=true` behind a trusted TLS-terminating proxy that
