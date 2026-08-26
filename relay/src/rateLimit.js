@@ -5,10 +5,12 @@ class TokenBucket {
     this.now = now;
     this.tokens = limit;
     this.updatedAt = now();
+    this.lastUsedAt = this.updatedAt;
   }
 
   consume() {
     const current = this.now();
+    this.lastUsedAt = current;
     const elapsed = Math.max(0, current - this.updatedAt);
     this.tokens = Math.min(
       this.limit,

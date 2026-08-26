@@ -15,7 +15,6 @@ function generateCode(length = 6) {
 
 function normalizeCode(input) {
   if (typeof input !== 'string') return null;
-  if (input.includes('l')) return null;
   const value = input.trim().toUpperCase().replace(/[-\s]/g, '');
   if (!/^[A-Z2-9]{4,6}$/.test(value)) return null;
   return [...value].every(character => CODE_ALPHABET.includes(character))

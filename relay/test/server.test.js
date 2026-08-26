@@ -56,6 +56,14 @@ test('creates, joins, rejects full and unknown rooms, and exposes health', async
   assert.equal(created.type, 'room_created');
   assert.match(created.payload.joinUrl, /\/versus\/[A-Z2-9]{6}$/);
   assert.ok(!('word' in created.payload));
+  const alreadyInRoom = nextMessage(host);
+  host.send(JSON.stringify({ v: 1, type: 'create_room', payload: {} }));
+  const alreadyMessage = await alreadyInRoom;
+  assert.equal(alreadyMessage.payload.code, 'ALREADY_IN_ROOM');
+  assert.equal(alreadyMessage.seq, 0);
+  const pong = nextMessage(host);
+  host.send(JSON.stringify({ v: 1, type: 'ping', payload: {} }));
+  assert.equal((await pong).seq, 0);
 
   const guest = connect(port);
   await waitOpen(guest);
@@ -115,11 +123,11 @@ test('creates, joins, rejects full and unknown rooms, and exposes health', async
   await relay.close();
 });
 
-test('rejects disallowed origins in secure mode', async () => {
+test('enforces configured origins even in insecure mode', async () => {
   const relay = createRelayServer(
     config({
-      RELAY_ALLOW_INSECURE: 'false',
-      ALLOWED_ORIGINS: 'https://allowed.example',
+      RELAY_ALLOW_INSECURE: 'true',
+      ALLOWED_ORIGINS: 'http://allowed.example',
     })
   );
   const port = await startServer(relay);
@@ -127,13 +135,15 @@ test('rejects disallowed origins in secure mode', async () => {
     () =>
       new Promise((resolve, reject) => {
         const ws = new WebSocket(`ws://127.0.0.1:${port}/ws`, {
-          origin: 'https://denied.example',
-          headers: { 'x-forwarded-proto': 'https' },
+          origin: 'http://denied.example',
         });
         ws.once('open', resolve);
         ws.once('error', reject);
       })
   );
+  const allowed = connect(port, 'http://allowed.example');
+  await waitOpen(allowed);
+  await closeSocket(allowed);
   await relay.close();
 });
 

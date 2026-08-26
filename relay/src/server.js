@@ -3,7 +3,7 @@ const https = require('node:https');
 const fs = require('node:fs');
 const WebSocket = require('ws');
 const { attachConnection } = require('./connection');
-const { InMemoryRoomStore, RelayError } = require('./rooms');
+const { InMemoryRoomStore } = require('./rooms');
 const { createRateLimiter } = require('./rateLimit');
 const {
   MESSAGE_TYPES,
@@ -12,6 +12,8 @@ const {
   CLOSE_REASONS,
   envelope,
 } = require('./protocol');
+
+const MAX_JOIN_LIMITERS = 10000;
 
 function json(res, status, body) {
   res.writeHead(status, { 'content-type': 'application/json' });
@@ -63,7 +65,14 @@ function log(
 
 function createRelayServer(
   config,
-  { store = new InMemoryRoomStore(config) } = {}
+  {
+    store = new InMemoryRoomStore({
+      maxRooms: config.maxRooms,
+      codeLength: config.roomCodeLength,
+      unjoinedTtlMs: config.unjoinedTtlMs,
+      idleTtlMs: config.idleTtlMs,
+    }),
+  } = {}
 ) {
   const tls = config.tlsCertPath && config.tlsKeyPath;
   const httpServer = tls
@@ -227,7 +236,7 @@ function createRelayServer(
       return;
     }
     if (
-      !config.allowInsecure &&
+      config.allowedOrigins.length > 0 &&
       !originAllowed(req.headers.origin, config.allowedOrigins)
     ) {
       rejectUpgrade(socket, 403, ERROR_CODES.FORBIDDEN_ORIGIN);
@@ -240,6 +249,10 @@ function createRelayServer(
     const ip = clientIp(req, config.trustProxyProto);
     let limiter = joinLimiters.get(ip);
     if (!limiter) {
+      if (joinLimiters.size >= MAX_JOIN_LIMITERS) {
+        const oldestIp = joinLimiters.keys().next().value;
+        joinLimiters.delete(oldestIp);
+      }
       limiter = createRateLimiter({
         limit: config.joinRateLimit,
         windowMs: config.joinRateWindowMs,
@@ -269,6 +282,15 @@ function createRelayServer(
   });
 
   const sweepTimer = setInterval(async () => {
+    const now = Date.now();
+    for (const [ip, limiter] of joinLimiters) {
+      if (
+        limiter.tokens >= limiter.limit &&
+        now - limiter.lastUsedAt >= limiter.windowMs
+      ) {
+        joinLimiters.delete(ip);
+      }
+    }
     await store.sweep();
   }, config.sweepIntervalMs);
   sweepTimer.unref();

@@ -30,10 +30,10 @@ function attachConnection(
     missedPongs: 0,
   };
 
-  const send = async (type, roomCode, payload) => {
+  const send = async (type, roomCode, payload, roomScoped = true) => {
     if (ws.readyState !== WebSocket.OPEN) return;
     let seq = 0;
-    if (roomCode) {
+    if (roomScoped && roomCode) {
       try {
         seq = await store.nextSeq(roomCode);
       } catch {
@@ -45,15 +45,7 @@ function attachConnection(
 
   const sendError = async (code, roomCode = session.roomCode) => {
     if (ws.readyState !== WebSocket.OPEN) return;
-    let seq = 0;
-    if (roomCode) {
-      try {
-        seq = await store.nextSeq(roomCode);
-      } catch {
-        seq = 0;
-      }
-    }
-    ws.send(JSON.stringify(errorEnvelope(code, instanceId, roomCode, seq)));
+    ws.send(JSON.stringify(errorEnvelope(code, instanceId, roomCode, 0)));
   };
 
   const fail = async code => {
@@ -65,7 +57,7 @@ function attachConnection(
 
   const createRoom = async () => {
     if (session.roomCode) {
-      await fail(ERROR_CODES.NOT_IN_ROOM);
+      await fail(ERROR_CODES.ALREADY_IN_ROOM);
       return;
     }
     const room = await store.createRoom({ codeLength: config.roomCodeLength });
@@ -87,7 +79,7 @@ function attachConnection(
 
   const joinRoom = async codeInput => {
     if (session.roomCode) {
-      await fail(ERROR_CODES.NOT_IN_ROOM);
+      await fail(ERROR_CODES.ALREADY_IN_ROOM);
       return;
     }
     const code = normalizeCode(codeInput);
@@ -172,7 +164,7 @@ function attachConnection(
           await leave();
           break;
         case MESSAGE_TYPES.PING:
-          await send(MESSAGE_TYPES.PONG, session.roomCode, {});
+          await send(MESSAGE_TYPES.PONG, session.roomCode, {}, false);
           break;
         default:
           await fail(ERROR_CODES.UNSUPPORTED_TYPE);

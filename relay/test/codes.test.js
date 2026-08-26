@@ -28,11 +28,12 @@ test('generated codes and tokens are not repeated in a sample', () => {
   assert.match(generateToken(), /^[a-f0-9]{32}$/);
 });
 
-test('normalization accepts case, dashes, and whitespace but rejects ambiguity', () => {
+test('normalization accepts case, dashes, whitespace, and lowercase L', () => {
   assert.equal(normalizeCode(' ab-c 2 3 '), 'ABC23');
+  assert.equal(normalizeCode('abcl'), 'ABCL');
   assert.equal(normalizeCode('O234'), null);
   assert.equal(normalizeCode('0ABC'), null);
   assert.equal(normalizeCode('I234'), null);
-  assert.equal(normalizeCode('l234'), null);
+  assert.equal(normalizeCode('1ABC'), null);
   assert.equal(normalizeCode('ABC'), null);
 });

@@ -59,6 +59,8 @@ Client messages have `type` `create_room`, `join_room`, `leave_room`, or `ping`.
 Their payloads are respectively `{}`, `{ "code": "ABC234" }`, `{}`, and `{}`.
 Relay messages are `room_created`, `room_joined`, `opponent_joined`,
 `opponent_left`, `room_closed`, `error`, and `pong`.
+Room-scoped events consume the room's monotonic `seq`; unicast `error` and
+`pong` envelopes use `seq: 0` and do not advance it.
 
 Room creation returns a CSPRNG-generated code from
 `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` and a share URL at
@@ -67,9 +69,9 @@ Room creation returns a CSPRNG-generated code from
 
 Error codes are `ROOM_FULL`, `ROOM_NOT_FOUND`, `ROOM_EXPIRED`,
 `CAPACITY_EXCEEDED`, `RATE_LIMITED`, `MESSAGE_TOO_LARGE`,
-`MALFORMED_MESSAGE`, `UNSUPPORTED_TYPE`, `NOT_IN_ROOM`, `FORBIDDEN_ORIGIN`,
-`INSECURE_TRANSPORT`, and `INTERNAL_ERROR`. Error messages are static and
-never echo input.
+`MALFORMED_MESSAGE`, `UNSUPPORTED_TYPE`, `NOT_IN_ROOM`, `ALREADY_IN_ROOM`,
+`FORBIDDEN_ORIGIN`, `INSECURE_TRANSPORT`, and `INTERNAL_ERROR`. Error messages
+are static and never echo input.
 
 ## Scaling and lifecycle
 
@@ -77,6 +79,9 @@ Rooms are evicted after ten minutes without a second player or after 30 minutes
 of inactivity. Capacity is approximately 1,000 rooms and 2,000 sockets per
 instance. Room addressing is explicit in every room-scoped event, each room
 owns its monotonic sequence, and envelopes identify their emitting instance.
+Join limiter buckets are pruned after refilling to capacity and a full bucket
+that has been idle for one window is removed. The process also caps the bucket
+map at 10,000 IPs by dropping its oldest entry when needed.
 The store is asynchronous by interface, so a Redis room/pub-sub adapter can
 replace `InMemoryRoomStore` in `rooms.js`; no event contract depends on a
 process-local socket identity. This avoids single-instance assumptions while

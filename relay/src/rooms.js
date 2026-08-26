@@ -62,8 +62,7 @@ class InMemoryRoomStore {
 
   isExpired(room, now = this.clock()) {
     return (
-      (room.state === 'waiting' &&
-        now - room.createdAt >= this.unjoinedTtlMs) ||
+      (room.joinedAt === null && now - room.createdAt >= this.unjoinedTtlMs) ||
       now - room.lastActivityAt >= this.idleTtlMs
     );
   }
@@ -128,7 +127,6 @@ class InMemoryRoomStore {
     }
     if (room.players.length === 1) {
       room.state = 'waiting';
-      room.joinedAt = null;
     }
     return room;
   }
@@ -147,7 +145,7 @@ class InMemoryRoomStore {
     for (const room of this.rooms.values()) {
       let reason = null;
       if (
-        room.state === 'waiting' &&
+        room.joinedAt === null &&
         now - room.createdAt >= this.unjoinedTtlMs
       ) {
         reason = 'expired_unjoined';
