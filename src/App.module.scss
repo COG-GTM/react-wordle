@@ -52,6 +52,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.unlimitedToggle {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .unlimitedLabel {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+}
+
 .container {
   height: 100vh;
   max-width: 1200px;

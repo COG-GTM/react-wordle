@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Header from 'components/Header';
 import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
+import Switch from 'components/Switch';
 import Alert from 'components/Alert';
 import InfoModal from 'components/InfoModal';
 import SettingModal from 'components/SettingModal';
@@ -270,11 +271,9 @@ function App() {
       <SettingModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
-        isUnlimitedMode={isUnlimitedMode}
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
-        setIsUnlimitedMode={handleUnlimitedMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
@@ -293,6 +292,10 @@ function App() {
         onPlayAgain={handlePlayAgain}
         showAlert={showAlert}
       />
+      <div className={styles.unlimitedToggle}>
+        <span className={styles.unlimitedLabel}>Unlimited</span>
+        <Switch isOn={isUnlimitedMode} onToggle={handleUnlimitedMode} />
+      </div>
     </div>
   );
 }
