@@ -73,6 +73,7 @@ function loadConfig(env = process.env) {
     sweepIntervalMs: positiveNumber(env, 'SWEEP_INTERVAL_MS', 15000),
     maxRooms: positiveNumber(env, 'MAX_ROOMS', 1000),
     maxSockets: positiveNumber(env, 'MAX_SOCKETS', 2000),
+    roomlessSocketTtlMs: positiveNumber(env, 'ROOMLESS_SOCKET_TTL_MS', 120000),
     maxMessageBytes: positiveNumber(env, 'MAX_MESSAGE_BYTES', 2048),
     msgRateLimit: positiveNumber(env, 'MSG_RATE_LIMIT', 40),
     msgRateWindowMs: positiveNumber(env, 'MSG_RATE_WINDOW_MS', 10000),

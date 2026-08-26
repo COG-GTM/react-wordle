@@ -113,7 +113,7 @@ function attachConnection(
         playerToken: player.playerToken,
         role: player.role,
         opponentPresent: Boolean(host),
-        expiresAt: result.room.joinedAt + config.idleTtlMs,
+        expiresAt: result.room.lastActivityAt + config.idleTtlMs,
       });
       if (host) {
         await onPeerMessage(

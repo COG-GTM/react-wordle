@@ -30,6 +30,7 @@ origins are still enforced.
 | `IDLE_TTL_MS` | `1800000` | Idle-room TTL |
 | `SWEEP_INTERVAL_MS` | `15000` | Eviction sweep period |
 | `MAX_ROOMS` / `MAX_SOCKETS` | `1000` / `2000` | Per-instance caps |
+| `ROOMLESS_SOCKET_TTL_MS` | `120000` | Maximum lobby time before a roomless socket is closed |
 | `MAX_MESSAGE_BYTES` | `2048` | WebSocket message cap |
 | `MSG_RATE_LIMIT` / `MSG_RATE_WINDOW_MS` | `40` / `10000` | Per-connection message bucket |
 | `JOIN_RATE_LIMIT` / `JOIN_RATE_WINDOW_MS` | `10` / `60000` | Per-IP join/create bucket |
@@ -68,6 +69,8 @@ Relay messages are `room_created`, `room_joined`, `opponent_joined`,
 `opponent_left`, `room_closed`, `error`, and `pong`.
 Room-scoped events consume the room's monotonic `seq`; unicast `error` and
 `pong` envelopes use `seq: 0` and do not advance it.
+`room_created.expiresAt` is a fixed unjoined-room deadline, while
+`room_joined.expiresAt` is a sliding idle deadline that advances with activity.
 
 Room creation returns a CSPRNG-generated code from
 `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` and a share URL at

@@ -6,6 +6,7 @@ const { loadConfig } = require('../src/config');
 const { createRelayServer, pruneJoinLimiters } = require('../src/server');
 const { createRateLimiter } = require('../src/rateLimit');
 const { InMemoryRoomStore } = require('../src/rooms');
+const { CLOSE_CODES } = require('../src/protocol');
 
 function config(overrides = {}) {
   return loadConfig({
@@ -280,6 +281,30 @@ test('closes each room with one shutdown sequence', async () => {
   assert.equal(guestMessage.payload.reason, 'shutdown');
   assert.equal(hostMessage.seq, guestMessage.seq);
   assert.ok(hostMessage.seq > 0);
+});
+
+test('expires roomless sockets without closing room sockets', async () => {
+  const relay = createRelayServer(config({ ROOMLESS_SOCKET_TTL_MS: '100' }), {
+    heartbeatIntervalMs: 5,
+  });
+  const port = await startServer(relay);
+  const roomless = connect(port);
+  await waitOpen(roomless);
+  const roomlessClosed = new Promise(resolve =>
+    roomless.once('close', code => resolve(code))
+  );
+
+  const host = connect(port);
+  await waitOpen(host);
+  const hostCreated = nextMessage(host);
+  host.send(JSON.stringify({ v: 1, type: 'create_room', payload: {} }));
+  await hostCreated;
+
+  assert.equal(await roomlessClosed, CLOSE_CODES.POLICY_VIOLATION);
+  assert.equal(host.readyState, WebSocket.OPEN);
+
+  await closeSocket(host);
+  await relay.close();
 });
 
 test('prunes idle join limiters regardless of token balance', () => {

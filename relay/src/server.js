@@ -76,6 +76,7 @@ function createRelayServer(
       unjoinedTtlMs: config.unjoinedTtlMs,
       idleTtlMs: config.idleTtlMs,
     }),
+    heartbeatIntervalMs = 30000,
   } = {}
 ) {
   const tls = config.tlsCertPath && config.tlsKeyPath;
@@ -303,7 +304,16 @@ function createRelayServer(
   sweepTimer.unref();
 
   const heartbeatTimer = setInterval(() => {
+    const now = Date.now();
     for (const session of sessions) {
+      if (
+        !session.roomCode &&
+        now - session.connectedAt >= config.roomlessSocketTtlMs
+      ) {
+        log('roomless_socket_expired', { config, ...session });
+        session.ws.close(CLOSE_CODES.POLICY_VIOLATION);
+        continue;
+      }
       if (!session.isAlive) {
         session.missedPongs += 1;
         if (session.missedPongs >= 2) {
@@ -316,7 +326,7 @@ function createRelayServer(
       session.isAlive = false;
       session.ws.ping();
     }
-  }, 30000);
+  }, heartbeatIntervalMs);
   heartbeatTimer.unref();
 
   if (store.events && typeof store.events.on === 'function') {
