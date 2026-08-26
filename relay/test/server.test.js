@@ -53,6 +53,22 @@ test('insecure config defaults proxy trust off and app origin locally', () => {
   assert.equal(parsed.publicAppOrigin, 'http://localhost:3000');
 });
 
+test('blank numeric config values use defaults but invalid values throw', () => {
+  const parsed = loadConfig({
+    RELAY_ALLOW_INSECURE: 'true',
+    PORT: '  ',
+  });
+  assert.equal(parsed.port, 8080);
+  assert.throws(
+    () =>
+      loadConfig({
+        RELAY_ALLOW_INSECURE: 'true',
+        PORT: 'abc',
+      }),
+    /PORT must be a positive number/
+  );
+});
+
 test('creates, joins, rejects full and unknown rooms, and exposes health', async () => {
   const relay = createRelayServer(config());
   const port = await startServer(relay);

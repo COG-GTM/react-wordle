@@ -1,8 +1,20 @@
 const os = require('node:os');
 const crypto = require('node:crypto');
 
+function envValue(env, name, fallback) {
+  const value = env[name];
+  if (
+    value === undefined ||
+    value === null ||
+    (typeof value === 'string' && value.trim() === '')
+  ) {
+    return fallback;
+  }
+  return value;
+}
+
 function positiveNumber(env, name, fallback) {
-  const value = env[name] ?? fallback;
+  const value = envValue(env, name, fallback);
   const number = Number(value);
   if (!Number.isFinite(number) || number <= 0) {
     throw new Error(`${name} must be a positive number`);
@@ -11,7 +23,7 @@ function positiveNumber(env, name, fallback) {
 }
 
 function booleanValue(env, name, fallback) {
-  const value = env[name];
+  const value = envValue(env, name, undefined);
   if (value === undefined) return fallback;
   if (value === 'true' || value === '1') return true;
   if (value === 'false' || value === '0') return false;
@@ -20,7 +32,7 @@ function booleanValue(env, name, fallback) {
 
 function loadConfig(env = process.env) {
   const allowInsecure = booleanValue(env, 'RELAY_ALLOW_INSECURE', false);
-  const allowedOrigins = (env.ALLOWED_ORIGINS || '')
+  const allowedOrigins = envValue(env, 'ALLOWED_ORIGINS', '')
     .split(',')
     .map(origin => origin.trim())
     .filter(Boolean);
@@ -28,8 +40,8 @@ function loadConfig(env = process.env) {
     throw new Error('ALLOWED_ORIGINS is required in secure mode');
   }
 
-  const tlsCertPath = env.TLS_CERT_PATH || null;
-  const tlsKeyPath = env.TLS_KEY_PATH || null;
+  const tlsCertPath = envValue(env, 'TLS_CERT_PATH', null);
+  const tlsKeyPath = envValue(env, 'TLS_KEY_PATH', null);
   if ((tlsCertPath && !tlsKeyPath) || (!tlsCertPath && tlsKeyPath)) {
     throw new Error('TLS_CERT_PATH and TLS_KEY_PATH must be set together');
   }
@@ -45,10 +57,10 @@ function loadConfig(env = process.env) {
 
   const config = {
     port: positiveNumber(env, 'PORT', 8080),
-    host: env.HOST || '0.0.0.0',
+    host: envValue(env, 'HOST', '0.0.0.0'),
     allowedOrigins,
     publicAppOrigin:
-      env.PUBLIC_APP_ORIGIN ||
+      envValue(env, 'PUBLIC_APP_ORIGIN', null) ||
       allowedOrigins[0] ||
       (allowInsecure ? 'http://localhost:3000' : null),
     allowInsecure,
@@ -67,7 +79,7 @@ function loadConfig(env = process.env) {
     joinRateLimit: positiveNumber(env, 'JOIN_RATE_LIMIT', 10),
     joinRateWindowMs: positiveNumber(env, 'JOIN_RATE_WINDOW_MS', 60000),
     instanceId:
-      env.INSTANCE_ID ||
+      envValue(env, 'INSTANCE_ID', null) ||
       `${os.hostname()}-${crypto.randomBytes(4).toString('hex')}`,
   };
   return Object.freeze(config);
