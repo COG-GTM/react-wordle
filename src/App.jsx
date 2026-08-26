@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from 'components/Header';
 import Grid from 'components/Grid';
 import Keyboard from 'components/Keyboard';
@@ -9,11 +9,12 @@ import StatsModal from 'components/StatsModal';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useAlert from 'hooks/useAlert';
 import {
-  solution,
+  solution as dailySolution,
   solutionIndex,
   isWordValid,
   findFirstUnusedReveal,
   addStatsForCompletedGame,
+  getRandomWord,
 } from 'lib/words';
 import {
   ALERT_DELAY,
@@ -23,33 +24,60 @@ import {
 import styles from './App.module.scss';
 import 'styles/_transitionStyles.scss';
 
+const EMPTY_STATS = () => ({
+  winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
+  gamesFailed: 0,
+  currentStreak: 0,
+  bestStreak: 0,
+  totalGames: 0,
+  successRate: 0,
+});
+
 function App() {
+  const [gameMode, setGameMode] = useLocalStorage('gameMode', 'daily');
   const [boardState, setBoardState] = useLocalStorage('boardState', {
     guesses: [],
     solutionIndex: '',
   });
+  const [unlimitedState, setUnlimitedState] = useLocalStorage(
+    'unlimitedBoardState',
+    {
+      guesses: [],
+      solution: '',
+    }
+  );
   const [theme, setTheme] = useLocalStorage('theme', 'dark');
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
   );
   const [hardMode, setHardMode] = useLocalStorage('hard-mode', false);
-  const [stats, setStats] = useLocalStorage('gameStats', {
-    winDistribution: Array.from(new Array(MAX_CHALLENGES), () => 0),
-    gamesFailed: 0,
-    currentStreak: 0,
-    bestStreak: 0,
-    totalGames: 0,
-    successRate: 0,
-  });
+  const [stats, setStats] = useLocalStorage('gameStats', EMPTY_STATS());
+  const [practiceStats, setPracticeStats] = useLocalStorage(
+    'practiceStats',
+    EMPTY_STATS()
+  );
+
+  const isUnlimitedMode = gameMode === 'unlimited';
+  const [unlimitedSolution, setUnlimitedSolution] = useState(
+    () => unlimitedState.solution || getRandomWord()
+  );
+  const solution = isUnlimitedMode ? unlimitedSolution : dailySolution;
+
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState(() => {
+    if (gameMode === 'unlimited') return unlimitedState.guesses;
     if (boardState.solutionIndex !== solutionIndex) return [];
     return boardState.guesses;
   });
   const [isJiggling, setIsJiggling] = useState(false);
-  const [isGameWon, setIsGameWon] = useState(false);
-  const [isGameLost, setIsGameLost] = useState(false);
+  const [isGameWon, setIsGameWon] = useState(() =>
+    guessesInclude(guesses, solution)
+  );
+  const [isGameLost, setIsGameLost] = useState(
+    () =>
+      !guessesInclude(guesses, solution) && guesses.length === MAX_CHALLENGES
+  );
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -57,6 +85,11 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
+  const skipEndGameEffect = useRef(true);
+
+  function guessesInclude(guessList, word) {
+    return guessList.includes(word.toUpperCase());
+  }
 
   // Show welcome modal
   useEffect(() => {
@@ -65,18 +98,30 @@ function App() {
     // eslint-disable-next-line
   }, []);
 
-  // Save boardState to localStorage
+  // Save board state for the active mode to localStorage
   useEffect(() => {
-    setBoardState({
-      guesses,
-      solutionIndex,
-    });
+    if (isUnlimitedMode) {
+      setUnlimitedState({
+        guesses,
+        solution: unlimitedSolution,
+      });
+    } else {
+      setBoardState({
+        guesses,
+        solutionIndex,
+      });
+    }
     // eslint-disable-next-line
-  }, [guesses]);
+  }, [guesses, unlimitedSolution]);
 
   // Check game winning or losing
   useEffect(() => {
-    if (guesses.includes(solution.toUpperCase())) {
+    if (skipEndGameEffect.current) {
+      skipEndGameEffect.current = false;
+      return;
+    }
+
+    if (guessesInclude(guesses, solution)) {
       setIsGameWon(true);
       setTimeout(() => showAlert('Well done', 'success'), ALERT_DELAY);
       setTimeout(() => setIsStatsModalOpen(true), ALERT_DELAY + 1000);
@@ -99,6 +144,45 @@ function App() {
       document.body.setAttribute('data-mode', 'high-contrast');
     else document.body.removeAttribute('data-mode');
   }, [isDarkMode, isHighContrastMode]);
+
+  const loadBoard = (mode, activeSolution) => {
+    const restoredGuesses =
+      mode === 'unlimited'
+        ? unlimitedState.guesses
+        : boardState.solutionIndex === solutionIndex
+        ? boardState.guesses
+        : [];
+
+    skipEndGameEffect.current = true;
+    setGuesses([...restoredGuesses]);
+    setCurrentGuess('');
+    setIsGameWon(guessesInclude(restoredGuesses, activeSolution));
+    setIsGameLost(
+      !guessesInclude(restoredGuesses, activeSolution) &&
+        restoredGuesses.length === MAX_CHALLENGES
+    );
+  };
+
+  const handleGameMode = () => {
+    const newMode = isUnlimitedMode ? 'daily' : 'unlimited';
+    setGameMode(newMode);
+    loadBoard(
+      newMode,
+      newMode === 'unlimited' ? unlimitedSolution : dailySolution
+    );
+  };
+
+  const handleNewGame = () => {
+    const newWord = getRandomWord();
+    setUnlimitedSolution(newWord);
+    setUnlimitedState({ guesses: [], solution: newWord });
+    skipEndGameEffect.current = true;
+    setGuesses([]);
+    setCurrentGuess('');
+    setIsGameWon(false);
+    setIsGameLost(false);
+    setIsStatsModalOpen(false);
+  };
 
   const handleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -137,17 +221,24 @@ function App() {
     }
 
     if (isHardMode) {
-      const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
+      const firstMissingReveal = findFirstUnusedReveal(
+        currentGuess,
+        guesses,
+        solution
+      );
       if (firstMissingReveal) {
         setIsJiggling(true);
         return showAlert(firstMissingReveal, 'error');
       }
     }
 
+    const updateStats = isUnlimitedMode ? setPracticeStats : setStats;
+    const activeStats = isUnlimitedMode ? practiceStats : stats;
+
     if (currentGuess === solution.toUpperCase()) {
-      setStats(addStatsForCompletedGame(stats, guesses.length));
+      updateStats(addStatsForCompletedGame(activeStats, guesses.length));
     } else if (guesses.length + 1 === MAX_CHALLENGES) {
-      setStats(addStatsForCompletedGame(stats, guesses.length + 1));
+      updateStats(addStatsForCompletedGame(activeStats, guesses.length + 1));
     }
 
     setGuesses([...guesses, currentGuess]);
@@ -157,6 +248,7 @@ function App() {
   return (
     <div className={styles.container}>
       <Header
+        isUnlimitedMode={isUnlimitedMode}
         setIsInfoModalOpen={setIsInfoModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
@@ -165,6 +257,7 @@ function App() {
       <Grid
         currentGuess={currentGuess}
         guesses={guesses}
+        solution={solution}
         isJiggling={isJiggling}
         setIsJiggling={setIsJiggling}
       />
@@ -173,6 +266,7 @@ function App() {
         onDelete={handleDelete}
         onKeyDown={handleKeyDown}
         guesses={guesses}
+        solution={solution}
       />
       <InfoModal
         isOpen={isInfoModalOpen}
@@ -184,20 +278,25 @@ function App() {
         isHardMode={isHardMode}
         isDarkMode={isDarkMode}
         isHighContrastMode={isHighContrastMode}
+        isUnlimitedMode={isUnlimitedMode}
         setIsHardMode={handleHardMode}
         setIsDarkMode={handleDarkMode}
         setIsHighContrastMode={handleHighContrastMode}
+        setIsUnlimitedMode={handleGameMode}
       />
       <StatsModal
         isOpen={isStatsModalOpen}
         onClose={() => setIsStatsModalOpen(false)}
-        gameStats={stats}
+        gameStats={isUnlimitedMode ? practiceStats : stats}
         numberOfGuessesMade={guesses.length}
         isGameWon={isGameWon}
         isGameLost={isGameLost}
         isHardMode={isHardMode}
+        isUnlimitedMode={isUnlimitedMode}
         guesses={guesses}
+        solution={solution}
         showAlert={showAlert}
+        onNewGame={handleNewGame}
       />
     </div>
   );

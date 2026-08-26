@@ -77,6 +77,13 @@ h2 {
     }
   }
 
+  .newGame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+  }
+
   .share {
     flex: 1;
     margin-left: 1rem;

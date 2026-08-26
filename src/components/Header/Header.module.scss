@@ -9,6 +9,20 @@ h1 {
   color: var(--color-text-primary);
 }
 
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #a01ef7;
+  color: #fff;
+}
+
 button {
   margin: 0.5rem;
   cursor: pointer;
