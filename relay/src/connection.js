@@ -101,10 +101,10 @@ function attachConnection(
       playerId: player.playerId,
       playerToken: player.playerToken,
       role: player.role,
-      opponentPresent: Boolean(host && host.connected),
+      opponentPresent: Boolean(host),
       expiresAt: result.room.joinedAt + config.idleTtlMs,
     });
-    if (host && host.connected) {
+    if (host) {
       await onPeerMessage(code, host.playerId, MESSAGE_TYPES.OPPONENT_JOINED, {
         code,
       });

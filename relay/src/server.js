@@ -15,6 +15,14 @@ const {
 
 const MAX_JOIN_LIMITERS = 10000;
 
+function pruneJoinLimiters(limiters, now = Date.now()) {
+  for (const [ip, limiter] of limiters) {
+    if (now - limiter.lastUsedAt >= limiter.windowMs) {
+      limiters.delete(ip);
+    }
+  }
+}
+
 function json(res, status, body) {
   res.writeHead(status, { 'content-type': 'application/json' });
   res.end(JSON.stringify(body));
@@ -96,12 +104,12 @@ function createRelayServer(
     payload,
     seq = null
   ) => {
+    const sequence =
+      seq === null ? await store.nextSeq(roomCode).catch(() => 0) : seq;
     for (const session of sessions) {
       if (session.roomCode !== roomCode || session.playerId !== playerId)
         continue;
       if (session.ws.readyState !== WebSocket.OPEN) continue;
-      const sequence =
-        seq === null ? await store.nextSeq(roomCode).catch(() => 0) : seq;
       session.ws.send(
         JSON.stringify(
           envelope(type, roomCode, sequence, config.instanceId, payload)
@@ -117,14 +125,14 @@ function createRelayServer(
     close = false,
     seq = null
   ) => {
+    const sequence =
+      seq === null ? await store.nextSeq(roomCode).catch(() => 0) : seq;
     for (const session of [...sessions]) {
       if (
         session.roomCode !== roomCode ||
         session.ws.readyState !== WebSocket.OPEN
       )
         continue;
-      const sequence =
-        seq === null ? await store.nextSeq(roomCode).catch(() => 0) : seq;
       session.ws.send(
         JSON.stringify(
           envelope(type, roomCode, sequence, config.instanceId, payload)
@@ -282,15 +290,7 @@ function createRelayServer(
   });
 
   const sweepTimer = setInterval(async () => {
-    const now = Date.now();
-    for (const [ip, limiter] of joinLimiters) {
-      if (
-        limiter.tokens >= limiter.limit &&
-        now - limiter.lastUsedAt >= limiter.windowMs
-      ) {
-        joinLimiters.delete(ip);
-      }
-    }
+    pruneJoinLimiters(joinLimiters);
     await store.sweep();
   }, config.sweepIntervalMs);
   sweepTimer.unref();
@@ -318,7 +318,8 @@ function createRelayServer(
         item.code,
         MESSAGE_TYPES.ROOM_CLOSED,
         { code: item.code, reason: item.reason },
-        true
+        true,
+        item.seq
       );
     });
   }
@@ -353,4 +354,4 @@ function createRelayServer(
   return { httpServer, wss, close };
 }
 
-module.exports = { createRelayServer, originAllowed };
+module.exports = { createRelayServer, originAllowed, pruneJoinLimiters };

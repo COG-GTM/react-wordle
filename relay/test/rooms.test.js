@@ -8,7 +8,6 @@ function player(role = 'host') {
     playerId: `${role}-id`,
     playerToken: `${role}-token`,
     role,
-    connected: true,
   };
 }
 
@@ -47,10 +46,14 @@ test('sweep classifies unjoined and idle rooms', async () => {
   await store.joinRoom(ready.code, player('guest'));
   now = 11;
   const first = await store.sweep(now);
-  assert.deepEqual(first, [{ code: waiting.code, reason: 'expired_unjoined' }]);
+  assert.deepEqual(first, [
+    { code: waiting.code, reason: 'expired_unjoined', seq: 1 },
+  ]);
   now = 22;
   const second = await store.sweep(now);
-  assert.deepEqual(second, [{ code: ready.code, reason: 'expired_idle' }]);
+  assert.deepEqual(second, [
+    { code: ready.code, reason: 'expired_idle', seq: 1 },
+  ]);
 });
 
 test('a room that loses its guest uses idle TTL, not unjoined TTL', async () => {
@@ -68,8 +71,30 @@ test('a room that loses its guest uses idle TTL, not unjoined TTL', async () => 
   assert.deepEqual(await store.sweep(now), []);
   now = 21;
   assert.deepEqual(await store.sweep(now), [
-    { code: room.code, reason: 'expired_idle' },
+    { code: room.code, reason: 'expired_idle', seq: 1 },
   ]);
+});
+
+test('eviction sequence continues the room sequence', async () => {
+  let now = 0;
+  const store = new InMemoryRoomStore({
+    clock: () => now,
+    unjoinedTtlMs: 10,
+    idleTtlMs: 20,
+  });
+  const room = await store.createRoom({ codeLength: 4 });
+  assert.equal(await store.nextSeq(room.code), 1);
+  let emitted;
+  store.events.once('evicted', item => {
+    emitted = item;
+  });
+
+  now = 10;
+  const evicted = await store.sweep(now);
+  assert.deepEqual(evicted, [
+    { code: room.code, reason: 'expired_unjoined', seq: 2 },
+  ]);
+  assert.deepEqual(emitted, evicted[0]);
 });
 
 test('room cap and sequence are enforced', async () => {

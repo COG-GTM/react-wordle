@@ -47,11 +47,14 @@ function loadConfig(env = process.env) {
     port: positiveNumber(env, 'PORT', 8080),
     host: env.HOST || '0.0.0.0',
     allowedOrigins,
-    publicAppOrigin: env.PUBLIC_APP_ORIGIN || allowedOrigins[0] || null,
+    publicAppOrigin:
+      env.PUBLIC_APP_ORIGIN ||
+      allowedOrigins[0] ||
+      (allowInsecure ? 'http://localhost:3000' : null),
     allowInsecure,
     tlsCertPath,
     tlsKeyPath,
-    trustProxyProto: booleanValue(env, 'TRUST_PROXY_PROTO', true),
+    trustProxyProto: booleanValue(env, 'TRUST_PROXY_PROTO', false),
     roomCodeLength,
     unjoinedTtlMs: positiveNumber(env, 'UNJOINED_TTL_MS', 600000),
     idleTtlMs: positiveNumber(env, 'IDLE_TTL_MS', 1800000),

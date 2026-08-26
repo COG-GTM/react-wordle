@@ -46,7 +46,6 @@ class InMemoryRoomStore {
             playerId: crypto.randomUUID(),
             playerToken: generateToken(),
             role: 'host',
-            connected: true,
           },
         ],
         seq: 0,
@@ -87,7 +86,6 @@ class InMemoryRoomStore {
       playerId: crypto.randomUUID(),
       playerToken: generateToken(),
       role: 'guest',
-      connected: true,
     };
     room.players.push(player);
     room.state = 'ready';
@@ -153,9 +151,11 @@ class InMemoryRoomStore {
         reason = 'expired_idle';
       }
       if (reason) {
+        room.seq += 1;
+        const eviction = { code: room.code, reason, seq: room.seq };
         this.rooms.delete(room.code);
-        evicted.push({ code: room.code, reason });
-        this.events.emit('evicted', { code: room.code, reason });
+        evicted.push(eviction);
+        this.events.emit('evicted', eviction);
       }
     }
     return evicted;

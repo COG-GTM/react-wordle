@@ -3,7 +3,9 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const WebSocket = require('ws');
 const { loadConfig } = require('../src/config');
-const { createRelayServer } = require('../src/server');
+const { createRelayServer, pruneJoinLimiters } = require('../src/server');
+const { createRateLimiter } = require('../src/rateLimit');
+const { InMemoryRoomStore } = require('../src/rooms');
 
 function config(overrides = {}) {
   return loadConfig({
@@ -44,6 +46,12 @@ async function closeSocket(ws) {
   ws.close();
   await new Promise(resolve => ws.once('close', resolve));
 }
+
+test('insecure config defaults proxy trust off and app origin locally', () => {
+  const parsed = loadConfig({ RELAY_ALLOW_INSECURE: 'true' });
+  assert.equal(parsed.trustProxyProto, false);
+  assert.equal(parsed.publicAppOrigin, 'http://localhost:3000');
+});
 
 test('creates, joins, rejects full and unknown rooms, and exposes health', async () => {
   const relay = createRelayServer(config());
@@ -121,6 +129,63 @@ test('creates, joins, rejects full and unknown rooms, and exposes health', async
     closeSocket(bad),
   ]);
   await relay.close();
+});
+
+test('broadcasts one room sequence to every recipient', async () => {
+  let now = 0;
+  const store = new InMemoryRoomStore({
+    clock: () => now,
+    idleTtlMs: 10,
+  });
+  const relay = createRelayServer(config(), { store });
+  const port = await startServer(relay);
+  const host = connect(port);
+  await waitOpen(host);
+  const hostCreated = nextMessage(host);
+  host.send(JSON.stringify({ v: 1, type: 'create_room', payload: {} }));
+  const created = await hostCreated;
+
+  const guest = connect(port);
+  await waitOpen(guest);
+  const guestJoined = nextMessage(guest);
+  const opponentJoined = nextMessage(host);
+  guest.send(
+    JSON.stringify({
+      v: 1,
+      type: 'join_room',
+      payload: { code: created.payload.code },
+    })
+  );
+  await guestJoined;
+  await opponentJoined;
+
+  const hostClosed = nextMessage(host);
+  const guestClosed = nextMessage(guest);
+  now = 10;
+  await store.sweep(now);
+  const [hostMessage, guestMessage] = await Promise.all([
+    hostClosed,
+    guestClosed,
+  ]);
+  assert.equal(hostMessage.type, 'room_closed');
+  assert.equal(guestMessage.type, 'room_closed');
+  assert.equal(hostMessage.seq, guestMessage.seq);
+  assert.ok(hostMessage.seq > 0);
+  await relay.close();
+});
+
+test('prunes idle join limiters regardless of token balance', () => {
+  let now = 0;
+  const limiter = createRateLimiter({
+    limit: 1,
+    windowMs: 10,
+    now: () => now,
+  });
+  assert.equal(limiter.consume(), true);
+  const limiters = new Map([['127.0.0.1', limiter]]);
+  now = 10;
+  pruneJoinLimiters(limiters, now);
+  assert.equal(limiters.size, 0);
 });
 
 test('enforces configured origins even in insecure mode', async () => {

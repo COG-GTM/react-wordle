@@ -13,7 +13,8 @@ npm start
 
 Copy `.env.example` to the environment used by the process. Secure deployments
 must set `ALLOWED_ORIGINS` and use in-process TLS or an HTTPS reverse proxy.
-`RELAY_ALLOW_INSECURE=true` is only for local development and tests.
+`RELAY_ALLOW_INSECURE=true` is only for local development and tests; configured
+origins are still enforced.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
@@ -21,9 +22,9 @@ must set `ALLOWED_ORIGINS` and use in-process TLS or an HTTPS reverse proxy.
 | `HOST` | `0.0.0.0` | Bind address |
 | `ALLOWED_ORIGINS` | required in secure mode | Comma-separated exact origins |
 | `PUBLIC_APP_ORIGIN` | first allowed origin | Base URL for room links |
-| `RELAY_ALLOW_INSECURE` | `false` | Permit `ws://` and skip origin checks |
+| `RELAY_ALLOW_INSECURE` | `false` | Permit `ws://` and allow no origin list |
 | `TLS_CERT_PATH` / `TLS_KEY_PATH` | unset | In-process TLS certificate and key |
-| `TRUST_PROXY_PROTO` | `true` | Trust `x-forwarded-proto` |
+| `TRUST_PROXY_PROTO` | `false` | Trust forwarded protocol/IP headers only behind a trusted header-stripping proxy |
 | `ROOM_CODE_LENGTH` | `6` | Four to six characters |
 | `UNJOINED_TTL_MS` | `600000` | Waiting-room TTL |
 | `IDLE_TTL_MS` | `1800000` | Idle-room TTL |
@@ -38,6 +39,10 @@ must set `ALLOWED_ORIGINS` and use in-process TLS or an HTTPS reverse proxy.
 instance ID, and uptime without room codes or personal data. WebSockets use
 `/ws` and must use WSS outside insecure development mode. Application-level
 `ping` messages count as room activity; protocol-level WebSocket pings do not.
+In insecure mode without `PUBLIC_APP_ORIGIN` or an allowed origin, room links
+default to `http://localhost:3000`.
+Only set `TRUST_PROXY_PROTO=true` behind a trusted TLS-terminating proxy that
+strips or controls the forwarded protocol and client-IP headers.
 
 ## Protocol
 
@@ -79,9 +84,9 @@ Rooms are evicted after ten minutes without a second player or after 30 minutes
 of inactivity. Capacity is approximately 1,000 rooms and 2,000 sockets per
 instance. Room addressing is explicit in every room-scoped event, each room
 owns its monotonic sequence, and envelopes identify their emitting instance.
-Join limiter buckets are pruned after refilling to capacity and a full bucket
-that has been idle for one window is removed. The process also caps the bucket
-map at 10,000 IPs by dropping its oldest entry when needed.
+Join limiter buckets are pruned after being idle for one window. The process
+also caps the bucket map at 10,000 IPs by dropping its oldest entry when
+needed.
 The store is asynchronous by interface, so a Redis room/pub-sub adapter can
 replace `InMemoryRoomStore` in `rooms.js`; no event contract depends on a
 process-local socket identity. This avoids single-instance assumptions while
