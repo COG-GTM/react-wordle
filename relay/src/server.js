@@ -48,8 +48,24 @@ function clientIp(req, trustProxy) {
 }
 
 function safeIp(ip) {
-  if (ip.includes(':')) return `${ip.split(':').slice(0, 4).join(':')}::`;
-  return `${ip.split('.').slice(0, 3).join('.')}.*`;
+  if (!ip || ip === 'unknown') return 'unknown';
+  const address = ip.split('%')[0];
+  if (!address.includes(':')) {
+    return `${address.split('.').slice(0, 3).join('.')}.*`;
+  }
+  const mapped = address.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+  if (mapped) return safeIp(mapped[1]);
+  let groups;
+  if (address.includes('::')) {
+    const [head, tail = ''] = address.split('::');
+    const headGroups = head ? head.split(':') : [];
+    const tailGroups = tail ? tail.split(':') : [];
+    const missing = Math.max(8 - headGroups.length - tailGroups.length, 0);
+    groups = [...headGroups, ...Array(missing).fill('0'), ...tailGroups];
+  } else {
+    groups = address.split(':');
+  }
+  return `${groups.slice(0, 4).join(':')}::/64`;
 }
 
 function log(
@@ -366,4 +382,9 @@ function createRelayServer(
   return { httpServer, wss, close };
 }
 
-module.exports = { createRelayServer, originAllowed, pruneJoinLimiters };
+module.exports = {
+  createRelayServer,
+  originAllowed,
+  pruneJoinLimiters,
+  safeIp,
+};

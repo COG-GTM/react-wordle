@@ -66,15 +66,6 @@ class InMemoryRoomStore {
     );
   }
 
-  async addPlayer(code, player) {
-    const room = await this.getRoom(code);
-    if (!room) throw new RelayError(ERROR_CODES.ROOM_NOT_FOUND);
-    if (room.players.length >= 2) throw new RelayError(ERROR_CODES.ROOM_FULL);
-    room.players.push(player);
-    room.lastActivityAt = this.clock();
-    return room;
-  }
-
   async joinRoom(inputCode, player = null) {
     const code = normalizeCode(inputCode);
     if (!code) throw new RelayError(ERROR_CODES.ROOM_NOT_FOUND);

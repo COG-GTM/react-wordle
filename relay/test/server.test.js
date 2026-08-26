@@ -3,7 +3,11 @@ const assert = require('node:assert/strict');
 const http = require('node:http');
 const WebSocket = require('ws');
 const { loadConfig } = require('../src/config');
-const { createRelayServer, pruneJoinLimiters } = require('../src/server');
+const {
+  createRelayServer,
+  pruneJoinLimiters,
+  safeIp,
+} = require('../src/server');
 const { createRateLimiter } = require('../src/rateLimit');
 const { InMemoryRoomStore } = require('../src/rooms');
 
@@ -83,6 +87,18 @@ test('blank numeric config values use defaults but invalid values throw', () => 
       }),
     /PORT must be a positive number/
   );
+});
+
+test('redacts IPv4 and IPv6 addresses safely', () => {
+  assert.equal(safeIp('203.0.113.7'), '203.0.113.*');
+  assert.equal(safeIp('::1'), '0:0:0:0::/64');
+  assert.equal(safeIp('::ffff:203.0.113.7'), '203.0.113.*');
+  assert.equal(
+    safeIp('2001:db8:85a3:8d3:1319:8a2e:370:7348'),
+    '2001:db8:85a3:8d3::/64'
+  );
+  assert.equal(safeIp('fe80::1%eth0'), 'fe80:0:0:0::/64');
+  assert.equal(safeIp(undefined), 'unknown');
 });
 
 test('creates, joins, rejects full and unknown rooms, and exposes health', async () => {
