@@ -118,6 +118,7 @@ test('creates, joins, rejects full and unknown rooms, and exposes health', async
   assert.equal(created.type, 'room_created');
   assert.match(created.payload.joinUrl, /\/versus\/[A-Z2-9]{6}$/);
   assert.ok(!('word' in created.payload));
+  assert.equal(created.payload.expiresAt, now + relayConfig.idleTtlMs);
   const alreadyInRoom = nextMessage(host);
   host.send(JSON.stringify({ v: 1, type: 'create_room', payload: {} }));
   const alreadyMessage = await alreadyInRoom;

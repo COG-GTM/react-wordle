@@ -233,28 +233,6 @@ function createRelayServer(
       rejectUpgrade(socket, 404, 'NOT_FOUND');
       return;
     }
-    const forwardedProto = String(req.headers['x-forwarded-proto'] || '')
-      .split(',')[0]
-      .trim()
-      .toLowerCase();
-    const secure =
-      Boolean(req.socket.encrypted) ||
-      (config.trustProxyProto && forwardedProto === 'https');
-    if (!config.allowInsecure && !secure) {
-      rejectUpgrade(socket, 400, ERROR_CODES.INSECURE_TRANSPORT);
-      return;
-    }
-    if (
-      config.allowedOrigins.length > 0 &&
-      !originAllowed(req.headers.origin, config.allowedOrigins)
-    ) {
-      rejectUpgrade(socket, 403, ERROR_CODES.FORBIDDEN_ORIGIN);
-      return;
-    }
-    if (wss.clients.size >= config.maxSockets) {
-      rejectUpgrade(socket, 503, ERROR_CODES.CAPACITY_EXCEEDED);
-      return;
-    }
     const ip = clientIp(req, config.trustProxyProto);
     let limiter = joinLimiters.get(ip);
     if (limiter) {
@@ -276,6 +254,28 @@ function createRelayServer(
     }
     if (!limiter.consume()) {
       rejectUpgrade(socket, 429, ERROR_CODES.RATE_LIMITED);
+      return;
+    }
+    const forwardedProto = String(req.headers['x-forwarded-proto'] || '')
+      .split(',')[0]
+      .trim()
+      .toLowerCase();
+    const secure =
+      Boolean(req.socket.encrypted) ||
+      (config.trustProxyProto && forwardedProto === 'https');
+    if (!config.allowInsecure && !secure) {
+      rejectUpgrade(socket, 400, ERROR_CODES.INSECURE_TRANSPORT);
+      return;
+    }
+    if (
+      config.allowedOrigins.length > 0 &&
+      !originAllowed(req.headers.origin, config.allowedOrigins)
+    ) {
+      rejectUpgrade(socket, 403, ERROR_CODES.FORBIDDEN_ORIGIN);
+      return;
+    }
+    if (wss.clients.size >= config.maxSockets) {
+      rejectUpgrade(socket, 503, ERROR_CODES.CAPACITY_EXCEEDED);
       return;
     }
     wss.handleUpgrade(req, socket, head, ws => {

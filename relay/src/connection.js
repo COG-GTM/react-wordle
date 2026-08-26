@@ -79,7 +79,10 @@ function attachConnection(
         playerId: player.playerId,
         playerToken: player.playerToken,
         role: player.role,
-        expiresAt: room.createdAt + config.unjoinedTtlMs,
+        expiresAt: Math.min(
+          room.createdAt + config.unjoinedTtlMs,
+          room.lastActivityAt + config.idleTtlMs
+        ),
       });
     } finally {
       session.roomPending = false;
