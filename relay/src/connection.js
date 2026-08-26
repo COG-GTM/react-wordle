@@ -104,16 +104,15 @@ function attachConnection(
       session.playerToken = player.playerToken;
       session.roomCode = code;
       await store.touch(code);
-      const host = result.room.players.find(
-        candidate => candidate.role === 'host'
-      );
+      const room = await store.getRoom(code);
+      const host = room.players.find(candidate => candidate.role === 'host');
       await send(MESSAGE_TYPES.ROOM_JOINED, code, {
         code,
         playerId: player.playerId,
         playerToken: player.playerToken,
         role: player.role,
         opponentPresent: Boolean(host),
-        expiresAt: result.room.lastActivityAt + config.idleTtlMs,
+        expiresAt: room.lastActivityAt + config.idleTtlMs,
       });
       if (host) {
         await onPeerMessage(
@@ -122,6 +121,7 @@ function attachConnection(
           MESSAGE_TYPES.OPPONENT_JOINED,
           {
             code,
+            expiresAt: room.lastActivityAt + config.idleTtlMs,
           }
         );
       }
@@ -195,7 +195,7 @@ function attachConnection(
 
   ws.on('error', async error => {
     if (
-      error.code === 'WS_ERR_MESSAGE_TOO_BIG' ||
+      error.code === 'WS_ERR_UNSUPPORTED_MESSAGE_LENGTH' ||
       /max payload/i.test(error.message || '')
     ) {
       await fail(ERROR_CODES.MESSAGE_TOO_LARGE);

@@ -87,7 +87,28 @@ test('blank numeric config values use defaults but invalid values throw', () => 
 });
 
 test('creates, joins, rejects full and unknown rooms, and exposes health', async () => {
-  const relay = createRelayServer(config());
+  let now = 1000;
+  class SnapshotJoinRoomStore extends InMemoryRoomStore {
+    async joinRoom(...args) {
+      const result = await super.joinRoom(...args);
+      return {
+        ...result,
+        room: {
+          ...result.room,
+          players: result.room.players.map(player => ({ ...player })),
+        },
+      };
+    }
+
+    async touch(...args) {
+      now += 1;
+      return super.touch(...args);
+    }
+  }
+  const relayConfig = config({ IDLE_TTL_MS: '1000' });
+  const relay = createRelayServer(relayConfig, {
+    store: new SnapshotJoinRoomStore({ clock: () => now }),
+  });
   const port = await startServer(relay);
   const host = connect(port);
   await waitOpen(host);
@@ -119,7 +140,10 @@ test('creates, joins, rejects full and unknown rooms, and exposes health', async
   );
   const joined = await guestJoined;
   assert.equal(joined.type, 'room_joined');
-  assert.equal((await opponentJoined).type, 'opponent_joined');
+  const opponent = await opponentJoined;
+  assert.equal(opponent.type, 'opponent_joined');
+  assert.equal(opponent.payload.expiresAt, joined.payload.expiresAt);
+  assert.equal(opponent.payload.expiresAt, now + relayConfig.idleTtlMs);
 
   const third = connect(port);
   await waitOpen(third);

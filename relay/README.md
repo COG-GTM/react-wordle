@@ -75,6 +75,7 @@ messages. Unicast `error` and `pong` envelopes use `seq: 0` and do not advance
 it.
 `room_created.expiresAt` is a fixed unjoined-room deadline, while
 `room_joined.expiresAt` is a sliding idle deadline that advances with activity.
+The `opponent_joined` payload includes the same sliding `expiresAt` deadline.
 
 Room creation returns a CSPRNG-generated code from
 `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` and a share URL at
