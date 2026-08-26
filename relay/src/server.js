@@ -190,7 +190,6 @@ function createRelayServer(
       ...session,
     });
   };
-  onDisconnect.sendToPlayer = sendToPlayer;
 
   httpServer.on('request', async (req, res) => {
     if (req.method !== 'GET') {
@@ -291,6 +290,7 @@ function createRelayServer(
       instanceId: config.instanceId,
       ip: metadata.ip,
       onDisconnect,
+      sendToPlayer,
       log: (event, current) => log(event, { config, ...current }),
     });
     sessions.add(session);

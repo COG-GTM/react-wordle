@@ -33,7 +33,7 @@ origins are still enforced.
 | `ROOMLESS_SOCKET_TTL_MS` | `120000` | Maximum lobby time before a roomless socket is closed |
 | `MAX_MESSAGE_BYTES` | `2048` | WebSocket message cap |
 | `MSG_RATE_LIMIT` / `MSG_RATE_WINDOW_MS` | `40` / `10000` | Per-connection message bucket |
-| `JOIN_RATE_LIMIT` / `JOIN_RATE_WINDOW_MS` | `10` / `60000` | Per-IP join/create bucket |
+| `JOIN_RATE_LIMIT` / `JOIN_RATE_WINDOW_MS` | `10` / `60000` | Per-IP connection-rate bucket charged on every WebSocket upgrade |
 | `INSTANCE_ID` | hostname + random suffix | Emitter identity |
 
 `GET /healthz` returns service health. `GET /stats` returns room/socket counts,
@@ -67,8 +67,12 @@ Client messages have `type` `create_room`, `join_room`, `leave_room`, or `ping`.
 Their payloads are respectively `{}`, `{ "code": "ABC234" }`, `{}`, and `{}`.
 Relay messages are `room_created`, `room_joined`, `opponent_joined`,
 `opponent_left`, `room_closed`, `error`, and `pong`.
-Room-scoped events consume the room's monotonic `seq`; unicast `error` and
-`pong` envelopes use `seq: 0` and do not advance it.
+Room-scoped events use a per-room monotonic `seq` for ordering and
+de-duplication, not as a gapless counter: a sequence may be allocated but not
+delivered if the only recipients close mid-send. Clients may de-duplicate on
+`(roomCode, seq)` and compare ordering, but must not interpret gaps as lost
+messages. Unicast `error` and `pong` envelopes use `seq: 0` and do not advance
+it.
 `room_created.expiresAt` is a fixed unjoined-room deadline, while
 `room_joined.expiresAt` is a sliding idle deadline that advances with activity.
 

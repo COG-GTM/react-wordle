@@ -13,7 +13,7 @@ const { normalizeCode } = require('./codes');
 
 function attachConnection(
   ws,
-  { config, store, instanceId, ip, onDisconnect, log }
+  { config, store, instanceId, ip, onDisconnect, sendToPlayer, log }
 ) {
   const session = {
     ip,
@@ -142,9 +142,7 @@ function attachConnection(
   };
 
   const onPeerMessage = async (roomCode, playerId, type, payload) => {
-    if (typeof onDisconnect.sendToPlayer === 'function') {
-      await onDisconnect.sendToPlayer(roomCode, playerId, type, payload);
-    }
+    await sendToPlayer(roomCode, playerId, type, payload);
   };
 
   ws.on('message', async (data, isBinary) => {
