@@ -335,21 +335,21 @@ function createRelayServer(
     shuttingDown = true;
     clearInterval(sweepTimer);
     clearInterval(heartbeatTimer);
+    const roomCodes = new Set();
     for (const session of sessions) {
       if (session.roomCode && session.ws.readyState === WebSocket.OPEN) {
-        const seq = await store.nextSeq(session.roomCode).catch(() => 0);
-        session.ws.send(
-          JSON.stringify(
-            envelope(
-              MESSAGE_TYPES.ROOM_CLOSED,
-              session.roomCode,
-              seq,
-              config.instanceId,
-              { code: session.roomCode, reason: CLOSE_REASONS.SHUTDOWN }
-            )
-          )
-        );
+        roomCodes.add(session.roomCode);
       }
+    }
+    for (const roomCode of roomCodes) {
+      await broadcastRoom(
+        roomCode,
+        MESSAGE_TYPES.ROOM_CLOSED,
+        { code: roomCode, reason: CLOSE_REASONS.SHUTDOWN },
+        true
+      );
+    }
+    for (const session of sessions) {
       session.ws.close(1000);
     }
     await new Promise(resolve => wss.close(resolve));

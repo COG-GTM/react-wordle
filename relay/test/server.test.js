@@ -244,6 +244,44 @@ test('broadcasts one room sequence to every recipient', async () => {
   await relay.close();
 });
 
+test('closes each room with one shutdown sequence', async () => {
+  const relay = createRelayServer(config());
+  const port = await startServer(relay);
+  const host = connect(port);
+  await waitOpen(host);
+  const hostCreated = nextMessage(host);
+  host.send(JSON.stringify({ v: 1, type: 'create_room', payload: {} }));
+  const created = await hostCreated;
+
+  const guest = connect(port);
+  await waitOpen(guest);
+  const guestJoined = nextMessage(guest);
+  const opponentJoined = nextMessage(host);
+  guest.send(
+    JSON.stringify({
+      v: 1,
+      type: 'join_room',
+      payload: { code: created.payload.code },
+    })
+  );
+  await guestJoined;
+  await opponentJoined;
+
+  const hostClosed = nextMessage(host);
+  const guestClosed = nextMessage(guest);
+  await relay.close();
+  const [hostMessage, guestMessage] = await Promise.all([
+    hostClosed,
+    guestClosed,
+  ]);
+  assert.equal(hostMessage.type, 'room_closed');
+  assert.equal(guestMessage.type, 'room_closed');
+  assert.equal(hostMessage.payload.reason, 'shutdown');
+  assert.equal(guestMessage.payload.reason, 'shutdown');
+  assert.equal(hostMessage.seq, guestMessage.seq);
+  assert.ok(hostMessage.seq > 0);
+});
+
 test('prunes idle join limiters regardless of token balance', () => {
   let now = 0;
   const limiter = createRateLimiter({

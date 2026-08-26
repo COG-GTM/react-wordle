@@ -41,6 +41,7 @@ function attachConnection(
         seq = 0;
       }
     }
+    if (ws.readyState !== WebSocket.OPEN) return;
     ws.send(JSON.stringify(envelope(type, roomCode, seq, instanceId, payload)));
   };
 
