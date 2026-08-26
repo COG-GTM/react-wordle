@@ -13,7 +13,7 @@ const { normalizeCode } = require('./codes');
 
 function attachConnection(
   ws,
-  { config, store, instanceId, ip, onDisconnect, log }
+  { config, store, instanceId, ip, onDisconnect, sendToPlayer, log }
 ) {
   const session = {
     ip,
@@ -71,7 +71,6 @@ function attachConnection(
       session.playerId = player.playerId;
       session.playerToken = player.playerToken;
       session.roomCode = room.code;
-      await store.touch(room.code);
       log('room_created', session);
       await send(MESSAGE_TYPES.ROOM_CREATED, room.code, {
         code: room.code,
@@ -103,7 +102,6 @@ function attachConnection(
       session.playerId = player.playerId;
       session.playerToken = player.playerToken;
       session.roomCode = code;
-      await store.touch(code);
       const host = result.room.players.find(
         candidate => candidate.role === 'host'
       );
@@ -116,14 +114,9 @@ function attachConnection(
         expiresAt: result.room.joinedAt + config.idleTtlMs,
       });
       if (host) {
-        await onPeerMessage(
+        await sendToPlayer(code, host.playerId, MESSAGE_TYPES.OPPONENT_JOINED, {
           code,
-          host.playerId,
-          MESSAGE_TYPES.OPPONENT_JOINED,
-          {
-            code,
-          }
-        );
+        });
       }
       log('room_joined', session);
     } finally {
@@ -139,12 +132,6 @@ function attachConnection(
     session.cleaned = true;
     await onDisconnect(session, true);
     ws.close(1000);
-  };
-
-  const onPeerMessage = async (roomCode, playerId, type, payload) => {
-    if (typeof onDisconnect.sendToPlayer === 'function') {
-      await onDisconnect.sendToPlayer(roomCode, playerId, type, payload);
-    }
   };
 
   ws.on('message', async (data, isBinary) => {

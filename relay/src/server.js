@@ -9,7 +9,6 @@ const { createRateLimiter } = require('./rateLimit');
 const {
   MESSAGE_TYPES,
   ERROR_CODES,
-  CLOSE_CODES,
   CLOSE_REASONS,
   envelope,
 } = require('./protocol');
@@ -191,8 +190,6 @@ function createRelayServer(
       ...session,
     });
   };
-  onDisconnect.sendToPlayer = sendToPlayer;
-
   httpServer.on('request', async (req, res) => {
     if (req.method !== 'GET') {
       json(res, 404, { error: 'not_found' });
@@ -204,13 +201,7 @@ function createRelayServer(
         status: 'ok',
         instanceId: config.instanceId,
         rooms: await store.size(),
-      });
-    } else if (path === '/stats') {
-      json(res, 200, {
-        rooms: await store.size(),
         sockets: wss.clients.size,
-        instanceId: config.instanceId,
-        uptimeMs: Math.round(process.uptime() * 1000),
       });
     } else {
       json(res, 404, { error: 'not_found' });
@@ -298,6 +289,7 @@ function createRelayServer(
       instanceId: config.instanceId,
       ip: metadata.ip,
       onDisconnect,
+      sendToPlayer,
       log: (event, current) => log(event, { config, ...current }),
     });
     sessions.add(session);
@@ -326,7 +318,7 @@ function createRelayServer(
       session.isAlive = false;
       session.ws.ping();
     }
-  }, 30000);
+  }, config.heartbeatIntervalMs);
   heartbeatTimer.unref();
 
   if (store.events && typeof store.events.on === 'function') {

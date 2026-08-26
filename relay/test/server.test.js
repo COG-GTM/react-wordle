@@ -157,6 +157,7 @@ test('creates, joins, rejects full and unknown rooms, and exposes health', async
     status: 'ok',
     instanceId: relayConfig.instanceId,
     rooms: 1,
+    sockets: 4,
   });
 
   await Promise.all([
@@ -190,17 +191,6 @@ test('serializes pipelined room creation requests', async () => {
     ).length,
     1
   );
-
-  const stats = await new Promise((resolve, reject) => {
-    http
-      .get(`http://127.0.0.1:${port}/stats`, response => {
-        let body = '';
-        response.on('data', chunk => (body += chunk));
-        response.on('end', () => resolve(JSON.parse(body)));
-      })
-      .on('error', reject);
-  });
-  assert.equal(stats.rooms, 1);
 
   await closeSocket(host);
   await relay.close();

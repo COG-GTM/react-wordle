@@ -29,16 +29,16 @@ origins are still enforced.
 | `UNJOINED_TTL_MS` | `600000` | Waiting-room TTL |
 | `IDLE_TTL_MS` | `1800000` | Idle-room TTL |
 | `SWEEP_INTERVAL_MS` | `15000` | Eviction sweep period |
+| `HEARTBEAT_INTERVAL_MS` | `30000` | WebSocket liveness heartbeat period |
 | `MAX_ROOMS` / `MAX_SOCKETS` | `1000` / `2000` | Per-instance caps |
 | `MAX_MESSAGE_BYTES` | `2048` | WebSocket message cap |
 | `MSG_RATE_LIMIT` / `MSG_RATE_WINDOW_MS` | `40` / `10000` | Per-connection message bucket |
 | `JOIN_RATE_LIMIT` / `JOIN_RATE_WINDOW_MS` | `10` / `60000` | Per-IP join/create bucket |
 | `INSTANCE_ID` | hostname + random suffix | Emitter identity |
 
-`GET /healthz` returns service health, instance ID, and the current room count.
-`GET /stats` returns room/socket counts, instance ID, and uptime without room
-codes or personal data. WebSockets use `/ws` and must use WSS outside insecure
-development mode. A non-empty `Origin` header is required; when
+`GET /healthz` returns service health, instance ID, room count, and socket count.
+WebSockets use `/ws` and must use WSS outside insecure development mode. A
+non-empty `Origin` header is required; when
 `ALLOWED_ORIGINS` is configured it must match one of the exact configured
 origins. Application-level
 `ping` messages refresh idle activity and protocol-level WebSocket pings do

@@ -87,6 +87,7 @@ function loadConfig(env = process.env) {
     unjoinedTtlMs: positiveInteger(env, 'UNJOINED_TTL_MS', 600000),
     idleTtlMs: positiveInteger(env, 'IDLE_TTL_MS', 1800000),
     sweepIntervalMs: positiveInteger(env, 'SWEEP_INTERVAL_MS', 15000),
+    heartbeatIntervalMs: positiveInteger(env, 'HEARTBEAT_INTERVAL_MS', 30000),
     maxRooms: positiveInteger(env, 'MAX_ROOMS', 1000),
     maxSockets: positiveInteger(env, 'MAX_SOCKETS', 2000),
     maxMessageBytes: positiveInteger(env, 'MAX_MESSAGE_BYTES', 2048),

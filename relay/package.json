@@ -13,7 +13,7 @@
     "fix": "prettier --write src test"
   },
   "dependencies": {
-    "ws": "8.18.0"
+    "ws": "8.21.3"
   },
   "devDependencies": {
     "prettier": "2.6.1"
