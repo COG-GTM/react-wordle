@@ -260,13 +260,13 @@ function createRelayServer(
       return;
     }
     const ip = clientIp(req, config.trustProxyProto);
-    pruneJoinLimiters(joinLimiters);
     let limiter = joinLimiters.get(ip);
     if (limiter) {
       joinLimiters.delete(ip);
       joinLimiters.set(ip, limiter);
     } else {
       if (joinLimiters.size >= MAX_JOIN_LIMITERS) {
+        pruneJoinLimiters(joinLimiters);
         const oldestIp = joinLimiters.keys().next().value;
         joinLimiters.delete(oldestIp);
       }
