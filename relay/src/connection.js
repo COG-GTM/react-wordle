@@ -147,29 +147,29 @@ function attachConnection(
   };
 
   ws.on('message', async (data, isBinary) => {
-    if (!session.limiter.consume()) {
-      session.strikes += 1;
-      await fail(ERROR_CODES.RATE_LIMITED);
-      if (session.strikes >= 3) ws.close(CLOSE_CODES.RATE_LIMITED);
-      return;
-    }
-    if (isBinary) {
-      await fail(ERROR_CODES.MALFORMED_MESSAGE);
-      return;
-    }
-    let parsed;
     try {
-      parsed = JSON.parse(data.toString());
-    } catch {
-      await fail(ERROR_CODES.MALFORMED_MESSAGE);
-      return;
-    }
-    const validation = validateInbound(parsed);
-    if (!validation.ok) {
-      await fail(validation.code);
-      return;
-    }
-    try {
+      if (!session.limiter.consume()) {
+        session.strikes += 1;
+        await fail(ERROR_CODES.RATE_LIMITED);
+        if (session.strikes >= 3) ws.close(CLOSE_CODES.RATE_LIMITED);
+        return;
+      }
+      if (isBinary) {
+        await fail(ERROR_CODES.MALFORMED_MESSAGE);
+        return;
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(data.toString());
+      } catch {
+        await fail(ERROR_CODES.MALFORMED_MESSAGE);
+        return;
+      }
+      const validation = validateInbound(parsed);
+      if (!validation.ok) {
+        await fail(validation.code);
+        return;
+      }
       if (session.roomCode) await store.touch(session.roomCode);
       switch (parsed.type) {
         case MESSAGE_TYPES.CREATE_ROOM:
