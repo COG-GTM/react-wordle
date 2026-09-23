@@ -45,6 +45,8 @@ function App() {
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState(() => {
     if (boardState.solutionIndex !== solutionIndex) return [];
+    if (boardState.guesses.some(guess => guess.length !== MAX_WORD_LENGTH))
+      return [];
     return boardState.guesses;
   });
   const [isJiggling, setIsJiggling] = useState(false);
