@@ -17,7 +17,7 @@
   padding: 1rem;
   text-align: center;
   position: relative;
-  max-width: 400px;
+  max-width: 460px;
 }
 
 .close {
@@ -39,7 +39,7 @@
 
 @media screen and (max-width: 480px) {
   .modal {
-    max-width: 350px;
+    max-width: 420px;
   }
 
   .title {

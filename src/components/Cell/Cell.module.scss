@@ -118,8 +118,16 @@
 
 @media screen and (max-width: 480px) {
   .cell {
-    width: 55px;
-    height: 55px;
-    font-size: 2.4rem;
+    width: 48px;
+    height: 48px;
+    font-size: 2.1rem;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .cell {
+    width: 42px;
+    height: 42px;
+    font-size: 1.8rem;
   }
 }

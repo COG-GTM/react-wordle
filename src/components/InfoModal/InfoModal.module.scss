@@ -7,7 +7,7 @@ h3 {
 
 .row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   grid-gap: 10px;
   margin-bottom: 0.25rem;
 }
@@ -16,5 +16,9 @@ h3 {
   h3 {
     font-size: 0.9rem;
     margin-bottom: 1rem;
+  }
+
+  .row {
+    grid-gap: 6px;
   }
 }
