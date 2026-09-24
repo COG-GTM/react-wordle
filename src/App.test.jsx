@@ -1,16 +1,15 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import App from './App';
 import { AlertProvider } from 'context/AlertContext';
+import {
+  solution as SOLUTION,
+  solutionIndex as SOLUTION_INDEX,
+} from 'lib/words';
 
-const SOLUTION = 'react';
-const SOLUTION_INDEX = 100;
-
-// the real solution rotates daily, so it is pinned for the whole suite
-jest.mock('lib/words', () => ({
-  ...jest.requireActual('lib/words'),
-  solution: 'react',
-  solutionIndex: 100,
-}));
+// the solution rotates daily, so a one word list pins it for the whole suite;
+// mocking the exports of `lib/words` instead would leave its scoring functions
+// working off the real word of the day
+jest.mock('constants/wordList', () => ({ WORDS: ['react'] }));
 
 const renderApp = () =>
   render(
