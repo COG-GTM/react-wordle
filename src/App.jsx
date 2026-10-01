@@ -15,6 +15,7 @@ import {
   findFirstUnusedReveal,
   addStatsForCompletedGame,
 } from 'lib/words';
+import { fireConfetti } from 'lib/confetti';
 import {
   ALERT_DELAY,
   MAX_CHALLENGES,
@@ -146,6 +147,7 @@ function App() {
 
     if (currentGuess === solution.toUpperCase()) {
       setStats(addStatsForCompletedGame(stats, guesses.length));
+      setTimeout(fireConfetti, ALERT_DELAY);
     } else if (guesses.length + 1 === MAX_CHALLENGES) {
       setStats(addStatsForCompletedGame(stats, guesses.length + 1));
     }
