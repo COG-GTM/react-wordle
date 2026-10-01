@@ -1,11 +1,16 @@
 {
-  "short_name": "Wordle React",
-  "name": "Wordle Game",
+  "short_name": "AT&T Wordle",
+  "name": "AT&T Wordle",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     },
     {
       "src": "logo192.png",
@@ -20,6 +25,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
+  "theme_color": "#0057b8",
   "background_color": "#ffffff"
 }
