@@ -2,7 +2,13 @@ import confetti from 'canvas-confetti';
 
 export const fireConfetti = () => {
   const end = Date.now() + 1500;
-  const defaults = { startVelocity: 45, spread: 70, ticks: 200, zIndex: 1000 };
+  const defaults = {
+    startVelocity: 45,
+    spread: 70,
+    ticks: 200,
+    zIndex: 1000,
+    disableForReducedMotion: true,
+  };
 
   confetti({
     ...defaults,
