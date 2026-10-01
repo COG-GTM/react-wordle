@@ -30,7 +30,8 @@ const InfoModal = ({ isOpen, onClose }) => {
       <h3>The letter I is in the word but in the wrong spot.</h3>
       <div className={styles.row}>
         <Cell value="V" />
-        <Cell value="A" />
+        <Cell value="O" />
+        <Cell value="L" />
         <Cell value="U" status="absent" isCompleted />
         <Cell value="M" />
         <Cell value="E" />
