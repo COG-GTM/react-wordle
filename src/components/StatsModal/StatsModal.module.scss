@@ -54,7 +54,7 @@ h2 {
   }
 
   .blue {
-    background: #189ccc;
+    background: var(--color-brand-blue);
   }
 
   .gray {
@@ -83,7 +83,7 @@ h2 {
   }
 
   button {
-    background: #a01ef7;
+    background: var(--color-button);
     width: 100%;
     display: block;
     color: #fff;

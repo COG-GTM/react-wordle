@@ -16,9 +16,8 @@
   border-radius: 5px;
   color: var(--color-key-text);
   font-size: 1.2rem;
-  font-weight: 500;
-  font-family: 'Lexend Deca';
-  font-family: 'Poppins';
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 600;
   text-transform: uppercase;
   display: flex;
   justify-content: center;
@@ -44,7 +43,7 @@
 
 .action {
   background-color: var(--color-key-secondary);
-  color: var(--color-background);
+  color: #fff;
   font-size: 0.9rem;
   width: auto;
 }

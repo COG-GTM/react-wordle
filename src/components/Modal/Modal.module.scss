@@ -1,5 +1,5 @@
 .modalContainer {
-  background: rgba($color: #777, $alpha: 0.5);
+  background: var(--color-modal-backdrop);
   position: fixed;
   top: 0;
   left: 0;
@@ -13,7 +13,9 @@
 
 .modal {
   background: var(--color-background);
+  border-top: 6px solid var(--color-brand-blue);
   border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 31, 66, 0.35);
   padding: 1rem;
   text-align: center;
   position: relative;
