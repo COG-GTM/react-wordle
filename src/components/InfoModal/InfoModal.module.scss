@@ -8,8 +8,14 @@ h3 {
 .row {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  grid-gap: 10px;
+  grid-gap: 5px;
   margin-bottom: 0.25rem;
+
+  > div {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -19,6 +25,12 @@ h3 {
   }
 
   .row {
-    grid-gap: 5px;
+    grid-gap: 4px;
+
+    > div {
+      width: 42px;
+      height: 42px;
+      font-size: 1.8rem;
+    }
   }
 }
