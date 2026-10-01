@@ -158,7 +158,7 @@ export const generateEmojiGrid = guesses => {
         .map((_, i) => {
           switch (status[i]) {
             case 'correct':
-              return '🟩';
+              return '🟦';
             case 'present':
               return '🟨';
             default:
