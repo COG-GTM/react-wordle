@@ -59,13 +59,14 @@ function App() {
   const isGameWon = guesses.includes(solution.toUpperCase());
   const isGameLost = !isGameWon && guesses.length === MAX_CHALLENGES;
   const [dailyCurrentGuess, setDailyCurrentGuess] = useState('');
+  const [practiceCurrentGuess, setPracticeCurrentGuess] = useState('');
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isHardMode, setIsHardMode] = useState(hardMode);
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
-  const { showAlert } = useAlert();
+  const { showAlert, hideAlert } = useAlert();
 
   // Show welcome modal
   useEffect(() => {
@@ -88,7 +89,7 @@ function App() {
     if (!isGameWon && !isGameLost) return;
     const alertTimer = setTimeout(() => {
       if (isGameWon) showAlert('Well done', 'success');
-      else showAlert(`The word was ${solution}`, 'error');
+      else showAlert(`The word was ${solution}`, 'error', true);
     }, ALERT_DELAY);
     const statsTimer = setTimeout(
       () => setIsStatsModalOpen(true),
@@ -129,8 +130,11 @@ function App() {
     if (!isPracticeMode) {
       setDailyCurrentGuess(currentGuess);
       if (!practiceGame) setPracticeGame(createPracticeGame());
+    } else {
+      setPracticeCurrentGuess(currentGuess);
     }
-    setCurrentGuess(isPracticeMode ? dailyCurrentGuess : '');
+    setCurrentGuess(isPracticeMode ? dailyCurrentGuess : practiceCurrentGuess);
+    hideAlert();
     setIsJiggling(false);
     setIsStatsModalOpen(false);
     setIsPracticeMode(!isPracticeMode);
@@ -139,6 +143,8 @@ function App() {
   const handlePlayAgain = () => {
     setPracticeGame(createPracticeGame());
     setCurrentGuess('');
+    setPracticeCurrentGuess('');
+    hideAlert();
     setIsJiggling(false);
     setIsStatsModalOpen(false);
   };

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, act } from '@testing-library/react';
 import { AlertProvider } from 'context/AlertContext';
-import { solutionIndex } from 'lib/words';
+import { solution, solutionIndex } from 'lib/words';
 import App from './App';
 
 beforeEach(() => {
@@ -50,14 +50,63 @@ test.each(['apple', 'brick'])(
     expect(screen.getByText('Play again')).toBeInTheDocument();
     expect(localStorage.getItem('boardState')).toBe(JSON.stringify(daily));
     expect(localStorage.getItem('gameStats')).toBe(statsBefore);
+    if (word === 'brick') {
+      act(() => jest.advanceTimersByTime(10000));
+      expect(screen.getByText('The word was apple')).toBeInTheDocument();
+    }
     fireEvent.click(screen.getByText('Play again'));
     expect(
       JSON.parse(localStorage.getItem('practiceBoardState')).guesses
     ).toEqual([]);
     act(() => jest.advanceTimersByTime(300));
+    expect(screen.queryByText('The word was apple')).not.toBeInTheDocument();
     toggle();
     expect(screen.queryByText('Practice')).not.toBeInTheDocument();
     expect(localStorage.getItem('boardState')).toBe(JSON.stringify(daily));
     expect(container.querySelectorAll('header button')).toHaveLength(3);
   }
 );
+
+test('swaps unfinished daily and practice drafts without losing either', () => {
+  localStorage.setItem(
+    'boardState',
+    JSON.stringify({ guesses: [], solutionIndex })
+  );
+  const { container } = render(
+    <AlertProvider>
+      <App />
+    </AlertProvider>
+  );
+  const toggle = () => {
+    fireEvent.click(container.querySelectorAll('header button')[2]);
+    fireEvent.click(screen.getAllByRole('checkbox')[0]);
+    fireEvent.click(
+      screen.getByText('Setting').parentElement.querySelector('button')
+    );
+    act(() => jest.advanceTimersByTime(300));
+  };
+  fireEvent.keyDown(window, { key: 'D' });
+  toggle();
+  fireEvent.keyDown(window, { key: 'P' });
+  toggle();
+  expect(container.querySelector('[class*="grid"]')).toHaveTextContent('D');
+  expect(container.querySelector('[class*="grid"]')).not.toHaveTextContent('P');
+  toggle();
+  expect(container.querySelector('[class*="grid"]')).toHaveTextContent('P');
+  expect(container.querySelector('[class*="grid"]')).not.toHaveTextContent('D');
+});
+
+test('daily loss solution stays visible after transient alert timeout', () => {
+  const wrongWord = solution === 'apple' ? 'BRICK' : 'APPLE';
+  localStorage.setItem(
+    'boardState',
+    JSON.stringify({ guesses: Array(6).fill(wrongWord), solutionIndex })
+  );
+  render(
+    <AlertProvider>
+      <App />
+    </AlertProvider>
+  );
+  act(() => jest.advanceTimersByTime(10000));
+  expect(screen.getByText(`The word was ${solution}`)).toBeInTheDocument();
+});
