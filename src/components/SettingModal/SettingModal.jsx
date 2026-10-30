@@ -11,9 +11,17 @@ const SettingModal = ({
   setIsHardMode,
   setIsDarkMode,
   setIsHighContrastMode,
+  isPracticeMode,
+  setIsPracticeMode,
 }) => {
   return (
     <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
+      <Row
+        title="Practice Mode"
+        desc="Unlimited random words. Daily progress and statistics are unchanged."
+        isOn={isPracticeMode}
+        onToggle={setIsPracticeMode}
+      />
       <Row
         title="Hard Mode"
         desc="Any revealed hints must be used in subsequent guesses"

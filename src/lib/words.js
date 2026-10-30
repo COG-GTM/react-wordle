@@ -9,9 +9,9 @@ export const isWordValid = word => {
   );
 };
 
-export const getGuessStatuses = guess => {
+export const getGuessStatuses = (guess, target = solution) => {
   const splitGuess = guess.toLowerCase().split('');
-  const splitSolution = solution.split('');
+  const splitSolution = target.split('');
 
   const statuses = [];
   const solutionCharsTaken = splitSolution.map(_ => false);
@@ -52,9 +52,9 @@ export const getGuessStatuses = guess => {
   return statuses;
 };
 
-export const getStatuses = guesses => {
+export const getStatuses = (guesses, target = solution) => {
   const charObj = {};
-  const splitSolution = solution.toUpperCase().split('');
+  const splitSolution = target.toUpperCase().split('');
 
   guesses.forEach(word => {
     word.split('').forEach((letter, i) => {
@@ -70,14 +70,14 @@ export const getStatuses = guesses => {
 // build a set of previously revealed letters - present and correct
 // guess must use correct letters in that space and any other revealed letters
 // also check if all revealed instances of a letter are used (i.e. two C's)
-export const findFirstUnusedReveal = (word, guesses) => {
+export const findFirstUnusedReveal = (word, guesses, target = solution) => {
   if (guesses.length === 0) {
     return false;
   }
 
   const lettersLeftArray = [];
   const guess = guesses[guesses.length - 1];
-  const statuses = getGuessStatuses(guess);
+  const statuses = getGuessStatuses(guess, target);
   const splitWord = word.toUpperCase().split('');
   const splitGuess = guess.toUpperCase().split('');
 
@@ -186,3 +186,8 @@ export const getWordOfDay = () => {
 };
 
 export const { solution, solutionIndex, tomorrow } = getWordOfDay();
+
+export const createPracticeGame = () => ({
+  solution: WORDS[Math.floor(Math.random() * WORDS.length)],
+  guesses: [],
+});

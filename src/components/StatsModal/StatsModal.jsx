@@ -14,6 +14,8 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  isPracticeMode,
+  onPlayAgain,
 }) => {
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
@@ -34,13 +36,21 @@ const StatsModal = ({
           <Progress
             key={i}
             index={i}
-            currentDayStatRow={numberOfGuessesMade === i + 1}
+            currentDayStatRow={!isPracticeMode && numberOfGuessesMade === i + 1}
             size={90 * (value / Math.max(...gameStats.winDistribution))}
             label={String(value)}
           />
         ))}
       </div>
-      {(isGameWon || isGameLost) && (
+      {isPracticeMode && (
+        <p>Practice games do not affect these daily statistics.</p>
+      )}
+      {isPracticeMode && (isGameWon || isGameLost) && (
+        <div className={styles.result}>
+          <button onClick={onPlayAgain}>Play again</button>
+        </div>
+      )}
+      {!isPracticeMode && (isGameWon || isGameLost) && (
         <div className={styles.result}>
           <div className={styles.countDown}>
             <h2>Next word in</h2>

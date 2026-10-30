@@ -6,6 +6,7 @@ export const AlertProvider = ({ children }) => {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
   const [isVisible, setIsVisible] = useState(false);
+  const hideAlert = () => setIsVisible(false);
 
   const showAlert = (alertMessage, alertStatus, persist) => {
     setMessage(alertMessage);
@@ -16,7 +17,9 @@ export const AlertProvider = ({ children }) => {
   };
 
   return (
-    <AlertContext.Provider value={{ message, status, isVisible, showAlert }}>
+    <AlertContext.Provider
+      value={{ message, status, isVisible, showAlert, hideAlert }}
+    >
       {children}
     </AlertContext.Provider>
   );

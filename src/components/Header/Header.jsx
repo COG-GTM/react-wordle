@@ -5,6 +5,7 @@ const Header = ({
   setIsInfoModalOpen,
   setIsStatsModalOpen,
   setIsSettingsModalOpen,
+  isPracticeMode,
 }) => {
   return (
     <header>
@@ -13,7 +14,7 @@ const Header = ({
           <BsInfoCircle size="1.6rem" color="var(--color-icon)" />
         </button>
       </div>
-      <h1>WORDLE</h1>
+      <h1>WORDLE {isPracticeMode && <small>Practice</small>}</h1>
       <div>
         <button onClick={() => setIsStatsModalOpen(true)}>
           <BsBarChart size="1.6rem" color="var(--color-icon)" />
