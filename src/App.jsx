@@ -8,6 +8,7 @@ import SettingModal from 'components/SettingModal';
 import StatsModal from 'components/StatsModal';
 import useLocalStorage from 'hooks/useLocalStorage';
 import useAlert from 'hooks/useAlert';
+import useGameTimer from 'hooks/useGameTimer';
 import {
   solution,
   solutionIndex,
@@ -57,6 +58,11 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(theme === 'dark');
   const [isHighContrastMode, setIsHighContrastMode] = useState(highContrast);
   const { showAlert } = useAlert();
+  const elapsedTime = useGameTimer(
+    solutionIndex,
+    guesses.includes(solution.toUpperCase()) ||
+      guesses.length === MAX_CHALLENGES
+  );
 
   // Show welcome modal
   useEffect(() => {
@@ -157,11 +163,14 @@ function App() {
   return (
     <div className={styles.container}>
       <Header
+        elapsedTime={elapsedTime}
         setIsInfoModalOpen={setIsInfoModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
-      <Alert />
+      <Alert
+        isModalOpen={isInfoModalOpen || isStatsModalOpen || isSettingsModalOpen}
+      />
       <Grid
         currentGuess={currentGuess}
         guesses={guesses}
@@ -189,6 +198,7 @@ function App() {
         setIsHighContrastMode={handleHighContrastMode}
       />
       <StatsModal
+        elapsedTime={elapsedTime}
         isOpen={isStatsModalOpen}
         onClose={() => setIsStatsModalOpen(false)}
         gameStats={stats}

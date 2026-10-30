@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { CSSTransition } from 'react-transition-group';
 import styles from './Alert.module.scss';
 
-const Alert = () => {
+const Alert = ({ isModalOpen = false }) => {
   const { message, status, isVisible } = useAlert();
 
   const classes = classNames({
@@ -13,7 +13,11 @@ const Alert = () => {
   });
 
   return (
-    <div className={styles.alertContainer}>
+    <div
+      className={classNames(styles.alertContainer, {
+        [styles.aboveModal]: isModalOpen,
+      })}
+    >
       <CSSTransition
         in={isVisible}
         timeout={300}
