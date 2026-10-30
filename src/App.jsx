@@ -168,7 +168,9 @@ function App() {
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
       />
-      <Alert />
+      <Alert
+        isModalOpen={isInfoModalOpen || isStatsModalOpen || isSettingsModalOpen}
+      />
       <Grid
         currentGuess={currentGuess}
         guesses={guesses}

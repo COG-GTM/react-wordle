@@ -18,6 +18,11 @@
   text-align: center;
 }
 
+.aboveModal {
+  top: 0.5rem;
+  white-space: nowrap;
+}
+
 .success {
   background-color: var(--color-alert-success);
 }
