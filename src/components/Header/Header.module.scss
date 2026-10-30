@@ -1,11 +1,26 @@
 header {
   display: flex;
   justify-content: space-between;
+
+  > div {
+    display: flex;
+    align-items: center;
+  }
+
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--color-icon);
+    outline-offset: 2px;
+  }
 }
 
 h1 {
   font-size: 2.3rem;
-  margin-left: 2.5rem;
+  margin-left: 0;
   color: var(--color-text-primary);
 }
 

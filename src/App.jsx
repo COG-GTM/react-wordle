@@ -47,6 +47,16 @@ function App() {
     if (boardState.solutionIndex !== solutionIndex) return [];
     return boardState.guesses;
   });
+  const [hintIndex, setHintIndex] = useState(() =>
+    boardState.solutionIndex === solutionIndex
+      ? boardState.hintIndex ?? null
+      : null
+  );
+  const isHintUsed = hintIndex !== null;
+  const isHintDisabled =
+    isHintUsed ||
+    guesses.includes(solution.toUpperCase()) ||
+    guesses.length >= MAX_CHALLENGES;
   const [isJiggling, setIsJiggling] = useState(false);
   const [isGameWon, setIsGameWon] = useState(false);
   const [isGameLost, setIsGameLost] = useState(false);
@@ -70,9 +80,10 @@ function App() {
     setBoardState({
       guesses,
       solutionIndex,
+      hintIndex,
     });
     // eslint-disable-next-line
-  }, [guesses]);
+  }, [guesses, hintIndex]);
 
   // Check game winning or losing
   useEffect(() => {
@@ -115,6 +126,18 @@ function App() {
     setHardMode(!isHardMode);
   };
 
+  const handleHint = () => {
+    if (isHintDisabled) return;
+
+    const unrevealedIndex = solution
+      .toUpperCase()
+      .split('')
+      .findIndex((letter, index) =>
+        guesses.every(guess => guess[index] !== letter)
+      );
+    setHintIndex(Math.max(0, unrevealedIndex));
+  };
+
   const handleKeyDown = letter =>
     currentGuess.length < MAX_WORD_LENGTH &&
     !isGameWon &&
@@ -137,6 +160,18 @@ function App() {
     }
 
     if (isHardMode) {
+      if (
+        isHintUsed &&
+        currentGuess[hintIndex] !== solution[hintIndex].toUpperCase()
+      ) {
+        setIsJiggling(true);
+        return showAlert(
+          `Must use ${solution[hintIndex].toUpperCase()} in position ${
+            hintIndex + 1
+          }`,
+          'error'
+        );
+      }
       const firstMissingReveal = findFirstUnusedReveal(currentGuess, guesses);
       if (firstMissingReveal) {
         setIsJiggling(true);
@@ -160,7 +195,16 @@ function App() {
         setIsInfoModalOpen={setIsInfoModalOpen}
         setIsStatsModalOpen={setIsStatsModalOpen}
         setIsSettingsModalOpen={setIsSettingsModalOpen}
+        onHint={handleHint}
+        isHintDisabled={isHintDisabled}
+        isHintUsed={isHintUsed}
       />
+      <p className={styles.hint} role="status">
+        {isHintUsed &&
+          `Hint: ${solution[hintIndex].toUpperCase()} in position ${
+            hintIndex + 1
+          } · 1 of 1 used`}
+      </p>
       <Alert />
       <Grid
         currentGuess={currentGuess}
@@ -198,6 +242,7 @@ function App() {
         isHardMode={isHardMode}
         guesses={guesses}
         showAlert={showAlert}
+        isHintUsed={isHintUsed}
       />
     </div>
   );
