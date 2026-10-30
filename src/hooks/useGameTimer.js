@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-const loadTimer = (solutionIndex, isGameOver) => {
+const readTimer = solutionIndex => {
   try {
     const saved = JSON.parse(localStorage.getItem('gameTimer'));
     if (
@@ -16,33 +16,70 @@ const loadTimer = (solutionIndex, isGameOver) => {
     // A missing or invalid timer should not prevent playing.
   }
 
-  return isGameOver
-    ? null
-    : { solutionIndex, startedAt: Date.now(), endedAt: null };
+  return null;
+};
+
+const reconcileTimers = (timer, saved) => {
+  if (!timer) return saved;
+  if (!saved) return timer;
+
+  const startedAt = Math.min(timer.startedAt, saved.startedAt);
+  const endedAt =
+    timer.endedAt === null
+      ? saved.endedAt
+      : saved.endedAt === null
+      ? timer.endedAt
+      : Math.min(timer.endedAt, saved.endedAt);
+
+  return startedAt === timer.startedAt && endedAt === timer.endedAt
+    ? timer
+    : { ...timer, startedAt, endedAt };
 };
 
 const useGameTimer = (solutionIndex, isGameOver) => {
-  const [timer, setTimer] = useState(() =>
-    loadTimer(solutionIndex, isGameOver)
+  const [timer, setTimer] = useState(
+    () =>
+      readTimer(solutionIndex) ??
+      (isGameOver
+        ? null
+        : { solutionIndex, startedAt: Date.now(), endedAt: null })
   );
   const [now, setNow] = useState(Date.now);
 
   useEffect(() => {
     if (!timer) return;
 
+    const saved = readTimer(solutionIndex);
+    const reconciled = reconcileTimers(timer, saved);
     const updated =
-      isGameOver && timer.endedAt === null
-        ? { ...timer, endedAt: Date.now() }
-        : timer;
+      isGameOver && reconciled.endedAt === null
+        ? { ...reconciled, endedAt: Date.now() }
+        : reconciled;
 
     if (updated !== timer) setTimer(updated);
 
     try {
-      localStorage.setItem('gameTimer', JSON.stringify(updated));
+      if (
+        saved?.startedAt !== updated.startedAt ||
+        saved?.endedAt !== updated.endedAt
+      ) {
+        localStorage.setItem('gameTimer', JSON.stringify(updated));
+      }
     } catch {
       // Keep timing in memory if browser storage is unavailable.
     }
-  }, [timer, isGameOver]);
+  }, [timer, isGameOver, solutionIndex]);
+
+  useEffect(() => {
+    const syncTimer = event => {
+      if (event.key !== 'gameTimer') return;
+      const saved = readTimer(solutionIndex);
+      if (saved) setTimer(current => reconcileTimers(current, saved));
+    };
+
+    window.addEventListener('storage', syncTimer);
+    return () => window.removeEventListener('storage', syncTimer);
+  }, [solutionIndex]);
 
   useEffect(() => {
     if (!timer || timer.endedAt !== null || isGameOver) return;

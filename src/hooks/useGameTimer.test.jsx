@@ -84,3 +84,58 @@ test('continues in memory when browser storage is unavailable', () => {
   advance(2000);
   expect(screen.getByTestId('elapsed')).toHaveTextContent('3000');
 });
+
+test('a stale tab preserves the first completed time instead of overwriting it', () => {
+  const view = render(<Timer />);
+  const startedAt = Date.now();
+  advance(5000);
+  const completed = {
+    solutionIndex: 123,
+    startedAt,
+    endedAt: startedAt + 2000,
+  };
+  localStorage.setItem('gameTimer', JSON.stringify(completed));
+
+  view.rerender(<Timer complete />);
+  expect(screen.getByTestId('elapsed')).toHaveTextContent('2000');
+  expect(JSON.parse(localStorage.getItem('gameTimer'))).toEqual(completed);
+});
+
+test('concurrent tabs converge on the earliest start and finish timestamps', () => {
+  const view = render(<Timer />);
+  const startedAt = Date.now() - 1000;
+  advance(5000);
+  localStorage.setItem(
+    'gameTimer',
+    JSON.stringify({
+      solutionIndex: 123,
+      startedAt,
+      endedAt: startedAt + 3000,
+    })
+  );
+
+  view.rerender(<Timer complete />);
+  expect(screen.getByTestId('elapsed')).toHaveTextContent('3000');
+  expect(JSON.parse(localStorage.getItem('gameTimer')).startedAt).toBe(
+    startedAt
+  );
+});
+
+test('synchronizes a completion from another tab without restarting its timer', () => {
+  render(<Timer />);
+  const startedAt = Date.now();
+  advance(5000);
+  const completed = {
+    solutionIndex: 123,
+    startedAt,
+    endedAt: startedAt + 2000,
+  };
+  act(() => {
+    localStorage.setItem('gameTimer', JSON.stringify(completed));
+    window.dispatchEvent(new StorageEvent('storage', { key: 'gameTimer' }));
+  });
+  advance(5000);
+  expect(screen.getByTestId('elapsed')).toHaveTextContent('2000');
+  expect(JSON.parse(localStorage.getItem('gameTimer'))).toEqual(completed);
+  expect(jest.getTimerCount()).toBe(0);
+});
