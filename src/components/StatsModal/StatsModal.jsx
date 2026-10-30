@@ -14,6 +14,7 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  isHintUsed,
 }) => {
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
@@ -22,6 +23,7 @@ const StatsModal = ({
 
   return (
     <Modal title="Statistics" isOpen={isOpen} onClose={onClose}>
+      {isHintUsed && <p className={styles.hinted}>This game: Hinted</p>}
       <div className={styles.statsBar}>
         <StatItem label="Played" value={gameStats.totalGames} />
         <StatItem label="Win Rate %" value={gameStats.successRate} />
