@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import { getStatuses } from 'lib/words';
 import styles from './Keyboard.module.scss';
 
-const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses }) => {
-  const charStatuses = getStatuses(guesses);
+const Keyboard = ({ onEnter, onDelete, onKeyDown, guesses, solution }) => {
+  const charStatuses = getStatuses(guesses, solution);
 
   useEffect(() => {
     const listener = e => {
