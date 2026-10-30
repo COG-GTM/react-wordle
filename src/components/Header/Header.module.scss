@@ -5,8 +5,21 @@ header {
 
 h1 {
   font-size: 2.3rem;
-  margin-left: 2.5rem;
   color: var(--color-text-primary);
+}
+
+.title {
+  margin-left: 2.5rem;
+  text-align: center;
+}
+
+.timer {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
 }
 
 button {

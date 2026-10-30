@@ -3,6 +3,7 @@ import CountDown from 'react-countdown';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
 import { shareStatus, tomorrow } from 'lib/words';
+import { formatElapsedTime } from 'lib/time';
 
 const StatsModal = ({
   isOpen,
@@ -14,6 +15,7 @@ const StatsModal = ({
   isHardMode,
   guesses,
   showAlert,
+  elapsedTime,
 }) => {
   const handleShare = () => {
     shareStatus(guesses, isGameLost, isHardMode);
@@ -40,6 +42,18 @@ const StatsModal = ({
           />
         ))}
       </div>
+      {(isGameWon || isGameLost) && (
+        <section className={styles.solveTime} aria-labelledby="game-time-title">
+          <h2 id="game-time-title">
+            {isGameWon ? 'Solve time' : 'Time played'}
+          </h2>
+          <p>
+            {elapsedTime === null
+              ? 'Not recorded'
+              : formatElapsedTime(elapsedTime)}
+          </p>
+        </section>
+      )}
       {(isGameWon || isGameLost) && (
         <div className={styles.result}>
           <div className={styles.countDown}>
