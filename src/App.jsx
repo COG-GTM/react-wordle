@@ -28,7 +28,7 @@ function App() {
     guesses: [],
     solutionIndex: '',
   });
-  const [theme, setTheme] = useLocalStorage('theme', 'dark');
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
   const [highContrast, setHighContrast] = useLocalStorage(
     'high-contrast',
     false
