@@ -23,6 +23,14 @@
   --color-text-primary: #000;
   --color-text-secondary: #333;
   --color-icon: #333;
+  --page-background: linear-gradient(
+    -45deg,
+    #ffd1dc,
+    #ffe7a3,
+    #c1f0c1,
+    #b5e3ff,
+    #e2c6ff
+  );
 
   [data-theme='dark'] {
     --color-background: #191919;
@@ -33,6 +41,7 @@
     --color-text-primary: #fff;
     --color-text-secondary: #adadad;
     --color-icon: #fff;
+    --page-background: var(--color-background);
   }
 
   [data-mode='high-contrast'] {
@@ -44,12 +53,32 @@
 body {
   font-size: 62.5%;
   font-family: 'Baloo 2', sans-serif;
-  background: var(--color-background);
+  background: var(--page-background);
+  background-size: 400% 400%;
+  animation: funBackground 20s ease infinite;
   color: #fff;
   min-height: 100vh;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes funBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
 }
 
 .container {
