@@ -1,5 +1,5 @@
 import { BsBarChart, BsGear, BsInfoCircle } from 'react-icons/bs';
-import './Header.module.scss';
+import './Header.scss';
 
 const Header = ({
   setIsInfoModalOpen,
