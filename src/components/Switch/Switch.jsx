@@ -1,28 +1,27 @@
 import classNames from 'classnames';
-import { useRef } from 'react';
 import styles from './Switch.module.scss';
 
-const Switch = ({ isOn, onToggle }) => {
-  const ref = useRef();
-
+const Switch = ({ isOn, onToggle, label }) => {
   const classes = classNames({
     [styles.label]: true,
     [styles.isOn]: isOn,
   });
 
   return (
-    <>
+    <label className={classes}>
       <input
         className={styles.switch}
         type="checkbox"
-        ref={ref}
+        role="switch"
+        aria-checked={isOn}
+        aria-label={label}
         checked={isOn}
         onChange={onToggle}
       />
-      <label className={classes} onClick={() => ref.current.click()}>
+      <span className={styles.track}>
         <span className={styles.button} />
-      </label>
-    </>
+      </span>
+    </label>
   );
 };
 
