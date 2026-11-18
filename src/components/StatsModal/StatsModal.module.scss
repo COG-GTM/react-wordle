@@ -1,118 +1,185 @@
 .statsBar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+}
+
+.statItem {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 72px;
+  padding: 0.75rem 0.5rem;
+  background: var(--color-surface-raised, rgba(148, 163, 184, 0.12));
+  border: 1px solid var(--color-border, rgba(148, 163, 184, 0.25));
+  border-radius: var(--radius-md, 10px);
 
-  .statItem {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    width: 200px;
+  .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
 
-    .value {
-      font-size: 1.6rem;
-      font-weight: 500;
-      margin: 0;
-      color: var(--color-text-primary);
-    }
-
-    .label {
-      font-size: 0.9rem;
-      font-weight: 400;
-      color: var(--color-text-secondary);
-    }
+  .label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--color-text-secondary);
   }
 }
 
-h2 {
-  font-size: 1.4rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
+.sectionTitle {
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
 }
 
 .winDistribution {
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
 }
 
 .progress {
   display: flex;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
 
   .index {
-    width: 20px;
-    margin-right: 0.5rem;
+    width: 1rem;
+    font-weight: 600;
+    text-align: center;
     color: var(--color-text-primary);
   }
 
-  .row {
-    width: 100%;
+  .track {
+    flex: 1;
   }
 
-  .line {
-    border-radius: 5px;
+  .bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 1.75rem;
+    height: 1.6rem;
+    padding: 0 0.5rem;
+    border-radius: var(--radius-sm, 6px);
+    background: var(--color-absent, #94a3b8);
+    color: #fff;
+    font-weight: 700;
+    transition: width 0.4s ease, background 0.2s;
+
+    &.current {
+      background: var(--color-correct, #22c55e);
+    }
   }
 
-  .blue {
-    background: #189ccc;
-  }
-
-  .gray {
-    background: #5d6061;
+  .barLabel {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 .result {
   display: flex;
-  padding: 0 2rem;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border, rgba(148, 163, 184, 0.25));
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
 
   .countDown {
     display: flex;
     flex-direction: column;
     flex: 1;
-
-    .time {
-      font-size: 1.4rem;
-      color: var(--color-text-primary);
-    }
+    align-items: center;
   }
 
-  .share {
-    flex: 1;
-    margin-left: 1rem;
+  .countDownLabel {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
   }
 
-  button {
-    background: #a01ef7;
-    width: 100%;
-    display: block;
-    color: #fff;
-    border-radius: 10px;
-    font-size: 1.4rem;
-    font-weight: 500;
-    padding: 0.5rem 0;
+  .time {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.shareButton {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: var(--radius-md, 10px);
+  background: var(--gradient-accent, linear-gradient(135deg, #7c3aed, #06b6d4));
+  box-shadow: var(--shadow-elevated, 0 10px 30px -10px rgba(124, 58, 237, 0.6));
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+
+  &:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent, #7c3aed);
+    outline-offset: 2px;
   }
 }
 
 @media screen and (max-width: 480px) {
-  h2 {
+  .statsBar {
+    gap: 0.35rem;
+  }
+
+  .statItem {
+    min-width: 0;
+    padding: 0.5rem 0.25rem;
+
+    .value {
+      font-size: 1.4rem;
+    }
+
+    .label {
+      font-size: 0.7rem;
+    }
+  }
+
+  .result .time {
     font-size: 1.2rem;
   }
 
-  .result {
-    padding: 0;
-
-    .countDown .time {
-      font-size: 1rem;
-    }
-
-    .share {
-      margin-left: 0;
-    }
-
-    button {
-      font-size: 1.2rem;
-      width: 90%;
-    }
+  .shareButton {
+    font-size: 1rem;
   }
 }
