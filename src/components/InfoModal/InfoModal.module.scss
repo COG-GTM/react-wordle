@@ -1,20 +1,63 @@
-h3 {
+.intro {
   font-size: 1rem;
-  font-weight: 300;
-  margin-bottom: 1.5rem;
+  font-weight: 400;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
   color: var(--color-text-secondary);
 }
 
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.example {
+  background: var(--color-surface, rgba(148, 163, 184, 0.08));
+  border: 1px solid var(--color-border, rgba(148, 163, 184, 0.2));
+  border-radius: var(--radius-md, 10px);
+  padding: 0.85rem 0.75rem 0.7rem;
+}
+
 .row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-gap: 10px;
-  margin-bottom: 0.25rem;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 0.6rem;
+
+  & > div {
+    width: 44px;
+    height: 44px;
+    font-size: 2rem;
+    border-radius: var(--radius-sm, 6px);
+    color: #fff;
+  }
+}
+
+.caption {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+
+  strong {
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
 }
 
 @media screen and (max-width: 480px) {
-  h3 {
+  .intro {
     font-size: 0.9rem;
     margin-bottom: 1rem;
+  }
+
+  .row > div {
+    width: 40px;
+    height: 40px;
+    font-size: 1.8rem;
+  }
+
+  .caption {
+    font-size: 0.85rem;
   }
 }
