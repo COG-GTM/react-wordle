@@ -1,8 +1,10 @@
 import classNames from 'classnames';
-import CountDown from 'react-countdown';
+import CountDown, { zeroPad } from 'react-countdown';
+import { RiShareLine } from 'react-icons/ri';
 import Modal from 'components/Modal';
 import styles from './StatsModal.module.scss';
-import { shareStatus, tomorrow } from 'lib/words';
+import { solutionIndex, tomorrow } from 'lib/words';
+import { copyToClipboard, getShareText } from './share';
 
 const StatsModal = ({
   isOpen,
@@ -12,47 +14,68 @@ const StatsModal = ({
   isGameWon,
   isGameLost,
   isHardMode,
+  isHighContrastMode,
   guesses,
   showAlert,
 }) => {
-  const handleShare = () => {
-    shareStatus(guesses, isGameLost, isHardMode);
-    showAlert('Game copied to clipboard', 'success');
+  const isGameFinished = isGameWon || isGameLost;
+  const maxDistribution = Math.max(...gameStats.winDistribution, 0);
+
+  const handleShare = async () => {
+    const text = getShareText({
+      guesses,
+      solutionIndex,
+      isGameLost,
+      isHardMode,
+      isHighContrastMode,
+    });
+
+    try {
+      await copyToClipboard(text);
+      showAlert('Copied to clipboard', 'success');
+    } catch (e) {
+      showAlert('Could not copy results', 'error');
+    }
   };
 
   return (
     <Modal title="Statistics" isOpen={isOpen} onClose={onClose}>
       <div className={styles.statsBar}>
         <StatItem label="Played" value={gameStats.totalGames} />
-        <StatItem label="Win Rate %" value={gameStats.successRate} />
-        <StatItem label="Current Streak" value={gameStats.currentStreak} />
-        <StatItem label="Best Streak" value={gameStats.bestStreak} />
+        <StatItem label="Win %" value={gameStats.successRate} />
+        <StatItem label="Current streak" value={gameStats.currentStreak} />
+        <StatItem label="Best streak" value={gameStats.bestStreak} />
       </div>
-      <h2>Guess Distribution</h2>
-      <div className={styles.winDistribution}>
+      <h3 className={styles.sectionTitle}>Guess distribution</h3>
+      <div className={styles.winDistribution} data-testid="win-distribution">
         {gameStats.winDistribution.map((value, i) => (
           <Progress
             key={i}
             index={i}
-            currentDayStatRow={numberOfGuessesMade === i + 1}
-            size={90 * (value / Math.max(...gameStats.winDistribution))}
-            label={String(value)}
+            value={value}
+            max={maxDistribution}
+            isCurrentGame={isGameWon && numberOfGuessesMade === i + 1}
           />
         ))}
       </div>
-      {(isGameWon || isGameLost) && (
+      {isGameFinished && (
         <div className={styles.result}>
           <div className={styles.countDown}>
-            <h2>Next word in</h2>
+            <span className={styles.countDownLabel}>Next word in</span>
             <CountDown
               date={tomorrow}
-              daysInHours={true}
-              className={styles.time}
+              renderer={({ hours, minutes, seconds, days }) => (
+                <span className={styles.time}>
+                  {zeroPad(days * 24 + hours)}:{zeroPad(minutes)}:
+                  {zeroPad(seconds)}
+                </span>
+              )}
             />
           </div>
-          <div className={styles.share}>
-            <button onClick={handleShare}>Share</button>
-          </div>
+          <button className={styles.shareButton} onClick={handleShare}>
+            Share
+            <RiShareLine size="1.2rem" aria-hidden="true" />
+          </button>
         </div>
       )}
     </Modal>
@@ -62,25 +85,28 @@ const StatsModal = ({
 const StatItem = ({ label, value }) => {
   return (
     <div className={styles.statItem}>
-      <h3 className={styles.value}>{value}</h3>
+      <span className={styles.value}>{value}</span>
       <span className={styles.label}>{label}</span>
     </div>
   );
 };
 
-const Progress = ({ index, label, size, currentDayStatRow }) => {
-  const classes = classNames({
-    [styles.line]: true,
-    [styles.blue]: currentDayStatRow,
-    [styles.gray]: !currentDayStatRow,
-  });
+const Progress = ({ index, value, max, isCurrentGame }) => {
+  const width = max > 0 ? (100 * value) / max : 0;
 
   return (
     <div className={styles.progress}>
       <div className={styles.index}>{index + 1}</div>
-      <div className={styles.row}>
-        <div className={classes} style={{ width: `${8 + size}%` }}>
-          {label}
+      <div className={styles.track}>
+        <div
+          className={classNames(styles.bar, {
+            [styles.current]: isCurrentGame,
+          })}
+          style={{ width: `${width}%` }}
+          data-testid={`distribution-bar-${index + 1}`}
+          data-current={isCurrentGame ? 'true' : undefined}
+        >
+          <span className={styles.barLabel}>{value}</span>
         </div>
       </div>
     </div>
