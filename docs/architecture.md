@@ -75,4 +75,4 @@ The Share button calls `shareStatus`, which builds the text `Wordle Game #<solut
 
 - `npm start`, `npm run build`, `npm test`: Create React App scripts. `jsconfig.json` sets `baseUrl: src`, so imports such as `components/Grid` and `lib/words` are absolute from `src/`.
 - `npm run check` / `npm run fix`: Prettier over `src/`.
-- Husky runs `lint-staged` (Prettier) on staged files in `src/` before each commit; `npm install` installs the hook through the `prepare` script.
+- `npm install` sets up Husky through the `prepare` script, and `.husky/pre-commit` is meant to run `lint-staged` (Prettier) on staged files in `src/`. The hook file is committed without the executable bit, so Git skips it and nothing formats commits automatically today.

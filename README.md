@@ -59,4 +59,4 @@ npm run check      # Prettier check of src/
 npm run fix        # Prettier write of src/
 ```
 
-`npm install` also installs a Husky pre-commit hook that runs Prettier on staged files in `src/`.
+`npm install` sets up Husky (`prepare` script) with a pre-commit hook meant to run Prettier on staged files in `src/`. The committed `.husky/pre-commit` is not executable, so Git currently skips it; run `npm run check` yourself before committing.
