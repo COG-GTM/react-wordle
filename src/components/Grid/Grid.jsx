@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import classNames from 'classnames';
 import Cell from 'components/Cell';
-import { getGuessStatuses } from 'lib/words';
+import { getGuessStatuses, solution } from 'lib/words';
 import { MAX_CHALLENGES, MAX_WORD_LENGTH } from 'constants/settings';
 import styles from './Grid.module.scss';
 
@@ -54,9 +54,10 @@ const CurrentRow = ({ guess, isJiggling }) => {
 const CompletedRow = ({ guess }) => {
   const cells = guess.split('');
   const statuses = getGuessStatuses(guess);
+  const isWinning = guess === solution.toUpperCase();
 
   return (
-    <div className={styles.row}>
+    <div className={styles.row} data-winning={isWinning || undefined}>
       {cells.map((letter, index) => (
         <Cell
           key={index}
@@ -64,6 +65,7 @@ const CompletedRow = ({ guess }) => {
           value={letter}
           isCompleted
           status={statuses[index]}
+          isWinning={isWinning}
         />
       ))}
     </div>
