@@ -23,7 +23,8 @@
     "eject": "react-scripts eject",
     "fix": "prettier --write src",
     "check": "prettier --check src",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "e2e": "playwright test"
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +45,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",
     "prettier": "2.6.1"
