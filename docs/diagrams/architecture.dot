@@ -1,0 +1,63 @@
+// Architecture of react-wordle (main). Render with ./render.sh
+// Everything runs in the browser: there is no backend.
+digraph architecture {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=20, labelloc=t, nodesep=0.4, ranksep=0.6, pad=0.3, newrank=true,
+         label="react-wordle architecture: client-only React 17 SPA (Create React App), no backend"];
+  node  [shape=box, style="rounded,filled", fillcolor=white, fontname="DejaVu Sans", fontsize=16, margin="0.15,0.08"];
+  edge  [fontname="DejaVu Sans", fontsize=13, color="#555555"];
+
+  user  [label="Player\n(physical keyboard / clicks)", shape=oval, fillcolor="#e8f0fe"];
+  index [label="public/index.html + src/index.js\nReactDOM.render(<AlertProvider><App/>)"];
+  fonts [label="Google Fonts\n(Baloo 2, Poppins)", shape=oval, fillcolor="#f2f2f2"];
+
+  app [label="App.jsx\nstate: guesses, currentGuess, stats, settings,\nmodal flags, isGameWon / isGameLost, isJiggling\nhandlers: handleKeyDown / handleDelete / handleEnter", fillcolor="#fff4d6"];
+
+  subgraph cluster_ui {
+    label="UI components (src/components)"; style="rounded,dashed"; color="#999999"; fontsize=16;
+    header   [label="Header\ninfo / stats / settings buttons"];
+    keyboard [label="Keyboard\non-screen keys + window keydown"];
+    grid     [label="Grid\ncompleted / current / empty rows"];
+    alert    [label="Alert\nCSSTransition toast"];
+    modals   [label="InfoModal / SettingModal / StatsModal\n(Modal, Switch, react-countdown)"];
+    cell     [label="Cell\nflip animation, colour by status"];
+  }
+
+  alertctx [label="context/AlertContext + hooks/useAlert\nshowAlert(message, status, persist)", fillcolor="#eef7ee"];
+  ls       [label="hooks/useLocalStorage -> localStorage\nboardState, gameStats, theme,\nhigh-contrast, hard-mode", shape=cylinder, fillcolor="#eef7ee"];
+  theme    [label="<body data-theme / data-mode>\nCSS variables in App.module.scss"];
+
+  words  [label="lib/words.js\ngetWordOfDay() at import:\nsolution, solutionIndex, tomorrow\nisWordValid, getGuessStatuses, getStatuses,\nfindFirstUnusedReveal (hard mode),\naddStatsForCompletedGame,\nshareStatus / generateEmojiGrid", fillcolor="#fde8e8"];
+  consts [label="src/constants\nwordList.js: WORDS (answers)\nvalidGuesses.js: VALID_GUESSES\nsettings.js: 5 letters, 6 tries, ALERT_DELAY"];
+  clip   [label="navigator.clipboard\n(Share button)", shape=cylinder];
+
+  { rank=same; user; index; fonts; }
+  { rank=same; header; keyboard; grid; }
+  { rank=same; alert; modals; cell; }
+  { rank=same; alertctx; ls; theme; }
+  { rank=same; words; consts; clip; }
+  alertctx -> words [style=invis]; ls -> consts [style=invis]; theme -> clip [style=invis];
+
+  user -> keyboard [label="letters, ENTER,\nBACKSPACE"];
+  user -> header [label="clicks"];
+  index -> fonts [style=dashed, label="<link>"];
+  index -> app;
+  index -> alertctx [label="provider", style=dashed];
+
+  app -> header; app -> keyboard; app -> grid; app -> alert; app -> modals;
+  keyboard -> app [label="onKeyDown / onDelete / onEnter", color="#c0392b", fontcolor="#c0392b"];
+  grid -> cell;
+  modals -> cell [label="InfoModal examples", style=dashed];
+
+  app -> alertctx [label="showAlert"];
+  modals -> alertctx [label="showAlert (share)", style=dashed];
+  alert -> alertctx [label="reads message /\nisVisible", style=dashed];
+  app -> ls [label="read / persist"];
+  app -> theme [label="useEffect"];
+
+  app -> words [label="validate guess,\nhard-mode check, stats"];
+  grid -> words [label="getGuessStatuses"];
+  keyboard -> words [label="getStatuses"];
+  modals -> words [label="shareStatus, tomorrow"];
+  words -> consts;
+  words -> clip;
+}
