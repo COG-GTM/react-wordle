@@ -13,20 +13,27 @@ const SettingModal = ({
   setIsHighContrastMode,
 }) => {
   return (
-    <Modal title="Setting" isOpen={isOpen} onClose={onClose}>
-      <Row
-        title="Hard Mode"
-        desc="Any revealed hints must be used in subsequent guesses"
-        isOn={isHardMode}
-        onToggle={setIsHardMode}
-      />
-      <Row title="Dark Mode" isOn={isDarkMode} onToggle={setIsDarkMode} />
-      <Row
-        title="High Contrast Mode"
-        desc="For improved color vision"
-        isOn={isHighContrastMode}
-        onToggle={setIsHighContrastMode}
-      />
+    <Modal title="Settings" isOpen={isOpen} onClose={onClose}>
+      <div className={styles.list}>
+        <Row
+          title="Hard Mode"
+          desc="Any revealed hints must be used in subsequent guesses"
+          isOn={isHardMode}
+          onToggle={setIsHardMode}
+        />
+        <Row
+          title="Dark Mode"
+          desc="Easier on the eyes at night"
+          isOn={isDarkMode}
+          onToggle={setIsDarkMode}
+        />
+        <Row
+          title="High Contrast Mode"
+          desc="For improved color vision"
+          isOn={isHighContrastMode}
+          onToggle={setIsHighContrastMode}
+        />
+      </div>
     </Modal>
   );
 };
@@ -34,13 +41,11 @@ const SettingModal = ({
 const Row = ({ title, desc, isOn, onToggle }) => {
   return (
     <div className={styles.row}>
-      <div>
+      <div className={styles.text}>
         <h2 className={styles.title}>{title}</h2>
-        <h3 className={styles.desc}>{desc}</h3>
+        {desc && <p className={styles.desc}>{desc}</p>}
       </div>
-      <div>
-        <Switch isOn={isOn} onToggle={onToggle} />
-      </div>
+      <Switch isOn={isOn} onToggle={onToggle} label={title} />
     </div>
   );
 };

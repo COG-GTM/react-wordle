@@ -196,6 +196,7 @@ function App() {
         isGameWon={isGameWon}
         isGameLost={isGameLost}
         isHardMode={isHardMode}
+        isHighContrastMode={isHighContrastMode}
         guesses={guesses}
         showAlert={showAlert}
       />
