@@ -1,5 +1,5 @@
 import { BsBarChart, BsGear, BsInfoCircle } from 'react-icons/bs';
-import './Header.module.scss';
+import styles from './Header.module.scss';
 
 const Header = ({
   setIsInfoModalOpen,
@@ -7,18 +7,30 @@ const Header = ({
   setIsSettingsModalOpen,
 }) => {
   return (
-    <header>
-      <div>
-        <button onClick={() => setIsInfoModalOpen(true)}>
+    <header className={styles.header}>
+      <div className={styles.actions}>
+        <button
+          className={styles.iconButton}
+          aria-label="How to play"
+          onClick={() => setIsInfoModalOpen(true)}
+        >
           <BsInfoCircle size="1.6rem" color="var(--color-icon)" />
         </button>
       </div>
-      <h1>WORDLE</h1>
-      <div>
-        <button onClick={() => setIsStatsModalOpen(true)}>
+      <h1 className={styles.title}>WORDLE</h1>
+      <div className={`${styles.actions} ${styles.actionsEnd}`}>
+        <button
+          className={styles.iconButton}
+          aria-label="Statistics"
+          onClick={() => setIsStatsModalOpen(true)}
+        >
           <BsBarChart size="1.6rem" color="var(--color-icon)" />
         </button>
-        <button onClick={() => setIsSettingsModalOpen(true)}>
+        <button
+          className={styles.iconButton}
+          aria-label="Settings"
+          onClick={() => setIsSettingsModalOpen(true)}
+        >
           <BsGear size="1.6rem" color="var(--color-icon)" />
         </button>
       </div>
