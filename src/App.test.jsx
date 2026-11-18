@@ -8,5 +8,5 @@ test('renders the game header', () => {
       <App />
     </AlertProvider>
   );
-  expect(screen.getByText('WORDLE')).toBeInTheDocument();
+  expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
 });
